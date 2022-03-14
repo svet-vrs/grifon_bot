@@ -4,11 +4,10 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 about_us = KeyboardButton("Узнать о нас❔")
 estate = KeyboardButton("Подобрать жилье🏡")
-get_gift = KeyboardButton("Поздравления🎄")
 managers = KeyboardButton("Менеджеры📱")
 
 menu_markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(
-    about_us, estate, managers, get_gift)
+    about_us, estate, managers)
 
 # Запрос контакта
 call_back_btn = KeyboardButton("Отмена")

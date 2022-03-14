@@ -34,7 +34,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
 credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-SAMPLE_SPREADSHEET_ID = ''
+SAMPLE_SPREADSHEET_ID = '1vkBpMw2fpXL5yUM1jQL8IBihddWtDmwCTF1covW7dm8'
 SAMPLE_RANGE_NAME = 'Лист1'
 service = build(
     'sheets', 'v4', credentials=credentials).spreadsheets().values()
@@ -139,7 +139,7 @@ async def welcome(message: types.Message):
 @dp.message_handler(content_types=['text'])
 async def menu_buttons(message: types.Message, state=FSMContext):
     global disc
-    if message.text == "Узнать о нас❔" or message.text == "Поздравления🎄" or message.text == "Менеджеры📱" or message.text == "Подобрать жилье🏡":
+    if message.text == "Узнать о нас❔" or message.text == "Менеджеры📱" or message.text == "Подобрать жилье🏡":
         if message.text == "Узнать о нас❔":
             await message.answer("Агенство недвижимости Феникс является гарантией качества и надежности для наших клиентов. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы, множество коммерческих помещений и эксклюзивных предложений от застройщиков нашего города", reply_markup=kb.site_markup,)
         elif message.text == "Поздравления🎄":
