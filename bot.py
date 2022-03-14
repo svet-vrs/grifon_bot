@@ -27,6 +27,7 @@ area = ""
 phone_number = ""
 ID = None
 disc = ""
+greeting = 'Я - <b>твой личный ассистент Grifon</b>, Мы организация, предоставляющая услуги быстрого и качественного подбора недвижимости!'
 
 # Взаимодействие с таблицей
 
@@ -83,13 +84,17 @@ async def make_changes_command(message: types.Message):
             await bot.send_message(message.from_user.id, 'Вам недоступна панель модератора', reply_markup=kb.menu_markup)
 
 
-
-@dp.message_handler(lambda message: message.text == "Удалить заявку по ID", state=None)
-async def enter_req_id(message: types.Message):
-    if message.chat.type == 'private':
-        if message.from_user.id == ID:
-            await Admin.delete_id.set()
-            await message.reply("Введите ID заявки, которую нужно удалить:", reply_markup=kb.admin_cancel_markup)
+@dp.callback_query_handler(text_contains="admin")
+async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    if call.data == "admin_delete":
+        await Admin.delete_id.set()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Введите ID заявки, которую нужно удалить:', reply_markup=kb.admin_sub_markup)
+    elif call.data == 'admin_exit':
+        await state.finish()
+        await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
+        await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
 # Команда отменад
 
@@ -141,7 +146,7 @@ async def delete_request(message: types.Message, state: FSMContext):
 
 # ////Клиентская часть////
 
-# Приветствие и появление меню
+# Приветствие и появление главного меню
 
 @dp.message_handler(commands=['start', 'help'], state=None)
 async def welcome(message: types.Message):
@@ -150,39 +155,25 @@ async def welcome(message: types.Message):
         await bot.send_message(message.from_user.id, "Добро пожаловать, " + message.from_user.first_name + " 👋\nЯ - <b>твой личный ассистент Phoenix</b>, Мы организация, предоставляющая услуги быстрого и качественного подбора недвижимости!",
                                parse_mode='html', reply_markup=kb.menu_markup)
 
-# Реакция на кнопки меню
+# Главное меню: реакция на кнопки
 
 
-@dp.message_handler(content_types=['text'])
-async def menu_buttons(message: types.Message, state=FSMContext):
-    if message.chat.type == 'private':
-        global disc
-        if message.text == "Узнать о нас❔" or message.text == "Менеджеры📱" or message.text == "Подобрать жилье🏡":
-            if message.text == "Узнать о нас❔":
-                await message.answer("Агенство недвижимости Феникс является гарантией качества и надежности для наших клиентов. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы, множество коммерческих помещений и эксклюзивных предложений от застройщиков нашего города", reply_markup=kb.site_markup,)
-            elif message.text == "Поздравления🎄":
-                disc = "Скидка активна"
-                await Estate.estates.set()
-                await message.answer("Расскажите о ваших планах на 2022 и получите подарок:", reply_markup=kb.app_markup)
-            if message.text == "Менеджеры📱":
-                await Admin.order_phone_num.set()
-                await message.answer("Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер", reply_markup=kb.contact_markup)
-            elif message.text == "Подобрать жилье🏡":
-                disc = ""
-                await Estate.estates.set()
-                await message.answer("Что вас интересует?", reply_markup=kb.app_markup)
-        else:
-            await message.reply("Вы дали некорректый ответ, пожалуйста воспользуйтесь кнопками меню!", reply_markup=kb.menu_markup)
+@dp.callback_query_handler(text_contains="menu")
+async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    if call.data == "menu_about":
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Агенство недвижимости Грифон является гарантией качества и надежности для наших клиентов. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы, множество коммерческих помещений и эксклюзивных предложений от застройщиков нашего города', reply_markup=kb.about_markup)
+    elif call.data == 'menu_estate':
+        await bot.answer_callback_query(call.id)
+        await Estate.estates.set()
+        await bot.send_message(call.from_user.id, 'Что вас интересует?', reply_markup=kb.estate_markup)
+    if call.data == 'menu_managers':
+        await bot.answer_callback_query(call.id)
+        await Admin.order_phone_num.set()
+        await bot.send_message(call.from_user.id, 'Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер.', reply_markup=kb.contact_markup)
 
-# Реакция на кнопку отмены отправки телефона менеджерам
-
-
-@dp.message_handler(state=Admin.order_phone_num)
-async def check_call_request(message: types.Message, state=FSMContext):
-    if message.chat.type == 'private':
-        if message.text == "Отмена":
-            await state.finish()
-            await message.reply('Вы отменили действие', reply_markup=kb.menu_markup)
+# Главное меню - Менеджеры: реакция на отправленный контакт
 
 
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
@@ -197,66 +188,82 @@ async def create_call_order(message: types.Message, state=FSMContext):
             order_num = str(phone)
         else:
             order_num = "+"+str(phone)
-        await message.answer("Вы заказали звонок,в скором времени с вами свяжутся✅", reply_markup=kb.menu_markup)
-        await bot.send_message(chat_id="-713436137", text="Поступила заявка на звонок \nФИО: "+str(data['order_name'])+"\nНомер: "+order_num, parse_mode='Markdown')
+        await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
+        await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['order_name'])+"\nНомер: "+order_num, parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
         await state.finish()
 
+# Главное меню - Менеджеры: реакция на кнопку назад
 
-# Реакция на кнопки взаимодействия с недвижимостью
 
-
-@dp.message_handler(state=Estate.estates)
-async def estate_buttons(message: types.Message, state: FSMContext):
+@dp.message_handler(state=Admin.order_phone_num)
+async def check_call_request(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
-        global disc
-        if message.text == "Приобрести недвижимость" or message.text == "Продать недвижимость" or message.text == "Снять жилье" or message.text == "Сдать в аренду жилье" or message.text == "Назад":
-            async with state.proxy() as data:
-                data['plan'] = disc
-            disc = ""
-            if message.text == "Приобрести недвижимость":
-                async with state.proxy() as data:
-                    data['user_id'] = message.from_user.id
-                async with state.proxy() as data:
-                    data['name'] = message.from_user.first_name
-                async with state.proxy() as data:
-                    data['estates'] = message.text
-                await Estate.next()
-                await message.answer("Сколько комнат вас интересует?", reply_markup=kb.rooms_markup)
-            elif message.text == "Продать недвижимость":
-                async with state.proxy() as data:
-                    data['user_id'] = message.from_user.id
-                async with state.proxy() as data:
-                    data['name'] = message.from_user.first_name
-                async with state.proxy() as data:
-                    data['estates'] = message.text
-                await Estate.next()
-                await message.answer("Сколько комнат в вашей собственности?", reply_markup=kb.rooms_markup)
-            if message.text == "Снять жилье":
-                async with state.proxy() as data:
-                    data['user_id'] = message.from_user.id
-                async with state.proxy() as data:
-                    data['name'] = message.from_user.first_name
-                async with state.proxy() as data:
-                    data['estates'] = message.text
-                await Estate.next()
-                await message.answer("Сколько комнат вас интересует?", reply_markup=kb.rooms_markup)
-            elif message.text == "Сдать в аренду жилье":
-                async with state.proxy() as data:
-                    data['user_id'] = message.from_user.id
-                async with state.proxy() as data:
-                    data['name'] = message.from_user.first_name
-                async with state.proxy() as data:
-                    data['estates'] = message.text
-                await Estate.next()
-                await message.answer("Сколько комнат в вашей собственности?", reply_markup=kb.rooms_markup)
-            if message.text == "Назад":
-                await state.finish()
-                await message.reply('Вы отменили действие', reply_markup=kb.menu_markup)
-        else:
-            await message.reply("Вы дали некорректый ответ, пожалуйста нажмите на кнопку!", reply_markup=kb.app_markup)
+        if message.text == "❌ Отмена":
+            await state.finish()
+            await bot.send_message(message.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
-# Результат первого вопроса покупки/аренды жилья
+# Главное меню - О нас: реакция на кнопку назад
 
+
+@dp.callback_query_handler(text="about_back")
+async def check_call_request(call: types.CallbackQuery, state=FSMContext):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    await bot.answer_callback_query(call.id)
+    await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
+
+
+# Главное меню - Подобрать жилье: реакция на кнопки
+
+@dp.callback_query_handler(state=Estate.estates, text_contains="estate")
+async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
+    await bot.delete_message(call.from_user.id, call.message.message_id)
+    if call.data == "estate_buy":
+        async with state.proxy() as data:
+            data['user_id'] = call.from_user.id
+        async with state.proxy() as data:
+            data['name'] = call.from_user.first_name
+        async with state.proxy() as data:
+            data['estates'] = "Приобрести недвижимость"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
+    elif call.data == "estate_sell":
+        async with state.proxy() as data:
+            data['user_id'] = call.from_user.id
+        async with state.proxy() as data:
+            data['name'] = call.from_user.first_name
+        async with state.proxy() as data:
+            data['estates'] = "Продать недвижимость"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
+    if call.data == "estate_rent":
+        async with state.proxy() as data:
+            data['user_id'] = call.from_user.id
+        async with state.proxy() as data:
+            data['name'] = call.from_user.first_name
+        async with state.proxy() as data:
+            data['estates'] = "Снять жилье"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
+    elif call.data == "estate_rent_out":
+        async with state.proxy() as data:
+            data['user_id'] = call.from_user.id
+        async with state.proxy() as data:
+            data['name'] = call.from_user.first_name
+        async with state.proxy() as data:
+            data['estates'] = "Сдать в аренду жилье"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, 'Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
+    if call.data == 'estate_back':
+        await state.finish()
+        await bot.answer_callback_query(call.id)
+        await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
+
+
+# Главное меню - Подобрать жилье - Кол-во комнат: реакция на кнопки
 
 @dp.message_handler(state=Estate.rooms)
 async def first_question(message: types.Message, state: FSMContext):
