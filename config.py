@@ -1,2 +1,4 @@
-#токен botfather
+# токен botfather
 TOKEN = '5147511306:AAGct4vGbYWOla9YTOY3ayGlIEAiT3dnRcQ'
+TABLE_ID = '1vkBpMw2fpXL5yUM1jQL8IBihddWtDmwCTF1covW7dm8'
+CHAT_ID = '-787566705'

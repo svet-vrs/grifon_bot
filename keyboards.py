@@ -53,14 +53,18 @@ back_button = KeyboardButton("Назад")
 app_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
     buy_app, sell_app, rent_app, rent_out_app, back_button)
 
-# Клавиатура админки
-
+# Клавиатура главной админки
 delete_user = KeyboardButton("Удалить заявку по ID")
-cancel_admin = KeyboardButton("Отмена удаления")
+exit_btn = KeyboardButton("Выйти с панели админа")
+bid_btn = KeyboardButton("Новые заявки")
+admin_main_markup = ReplyKeyboardMarkup(
+    resize_keyboard=True, one_time_keyboard=True).add(delete_user, exit_btn, bid_btn)  
+
+#Клавиатура удаления в админке
+
+cancel_admin = KeyboardButton("Отмена")
 admin_cancel_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(cancel_admin)
-admin_markup = ReplyKeyboardMarkup(
-    resize_keyboard=True, one_time_keyboard=True).add(delete_user)
 
 # Клавиатура заказа звонка
 order_call = KeyboardButton("Заказать звонок")
