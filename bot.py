@@ -220,8 +220,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
-            data['estates'] = "Купить недвижимость"
-        print(data['estates'])
+            data['estates'] = "Приобрести недвижимость"
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
@@ -262,63 +261,175 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
 
 
 # Главное меню - Подобрать жилье - Кол-во комнат: реакция на кнопки
-
-# @dp.callback_query_handler(state=Estate.rooms, text_contains="room")
-# async def first_question(call: types.CallbackQuery, state=FSMContext):
-#     async with state.proxy() as data:
-#             data['rooms'] = call.text
-#     await bot.delete_message(call.from_user.id, call.message.message_id)
-#     if call.data == "estate_buy":
-#         async with state.proxy() as data:
-#             data['user_id'] = call.from_user.id
-#         async with state.proxy() as data:
-#             data['name'] = call.from_user.first_name
-#         async with state.proxy() as data:
-#             data['estates'] = "Приобрести недвижимость"
-#         await Estate.next()
-#         await bot.answer_callback_query(call.id)
-#         await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
-# Результат второго вопроса покупки/аренды жилья
-
-
-@dp.message_handler(state=Estate.money)
-async def second_question(message: types.Message, state: FSMContext):
-    if message.chat.type == 'private':
+@dp.callback_query_handler(state=Estate.rooms, text_contains="room")
+async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
+    if call.data == "room_1":
         async with state.proxy() as data:
-            data['money'] = message.text
+            data['rooms'] = "1"
+        await Estate.next()
         if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
-            if data['money'] == "25000-45000" or data['money'] == "45000-65000" or data['money'] == "65000-90000" or data['money'] == "90000-130000" or data['money'] == "130000-250000":
-                await Estate.next()
-                if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Снять жилье":
-                    await message.reply("Какой район вас интересует?", reply_markup=kb.area_markup)
-                elif data['estates'] == "Продать недвижимость" or data['estates'] == "Сдать в аренду жилье":
-                    await message.reply("В каком районе ваша недвижимость?", reply_markup=kb.area_markup)
-            else:
-                await message.reply("Вы дали некорректый ответ, пожалуйста нажмите на кнопку!", reply_markup=kb.buy_markup)
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
         elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
-            if data['money'] == "300-500" or data['money'] == "500-700" or data['money'] == "700-1000" or data['money'] == "1000-1500" or data['money'] == "Выше 1500":
-                await Estate.next()
-                if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Снять жилье":
-                    await message.reply("Какой район вас интересует?", reply_markup=kb.area_markup)
-                elif data['estates'] == "Продать недвижимость" or data['estates'] == "Сдать в аренду жилье":
-                    await message.reply("В каком районе ваша недвижимость?", reply_markup=kb.area_markup)
-            else:
-                await message.reply("Вы дали некорректый ответ, пожалуйста нажмите на кнопку!", reply_markup=kb.rent_markup)
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какую сумму в USD💲 вы расчитываете?', reply_markup=kb.rent_markup)
+    elif call.data == "room_2":
+        async with state.proxy() as data:
+            data['rooms'] = "2"
+        await Estate.next()
+        if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
+        elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какую сумму в USD💲 вы расчитываете?', reply_markup=kb.rent_markup)
+    elif call.data == "room_3":
+        async with state.proxy() as data:
+            data['rooms'] = "3"
+        await Estate.next()
+        if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
+        elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какую сумму в USD💲 вы расчитываете?', reply_markup=kb.rent_markup)
+    elif call.data == "room_4more":
+        async with state.proxy() as data:
+            data['rooms'] = "4+"
+        await Estate.next()
+        if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
+        elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какую сумму в USD💲 вы расчитываете?', reply_markup=kb.rent_markup)
+    if call.data == 'room_back':
+        await state.finish()
+        await Estate.estates.set()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Что вас интересует?', reply_markup=kb.estate_markup)
 
+# Главное меню - Подобрать жилье - Кол-во комнат - Цена: реакция на кнопки(покупка)
+
+@dp.callback_query_handler(state=Estate.money, text_contains="pricebuy")
+async def second_question_buy(call: types.CallbackQuery, state=FSMContext):
+    if call.data == 'pricebuy_one':
+        async with state.proxy() as data:
+            data['money'] = '25000-45000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
+    elif call.data == 'pricebuy_two':
+        async with state.proxy() as data:
+            data['money'] = '45000-65000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
+    elif call.data == 'pricebuy_three':
+        async with state.proxy() as data:
+            data['money'] = '65000-90000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
+    elif call.data == 'pricebuy_four':
+        async with state.proxy() as data:
+            data['money'] = '90000-130000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
+    elif call.data == 'pricebuy_five':
+        async with state.proxy() as data:
+            data['money'] = '130000-250000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
+    elif call.data == 'pricebuy_back':
+        await state.finish()
+        await Estate.rooms.set()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
+    
+        
+                            
+#Главное меню - Подобрать жилье - Кол-во комнат - Цена: реакция на кнопки(аренда)
+@dp.callback_query_handler(state=Estate.money, text_contains="pricerent")
+async def second_question_rent(call: types.CallbackQuery, state=FSMContext):
+    if call.data == 'pricerent_one':
+        async with state.proxy() as data:
+            data['money'] = '350-500'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
+    elif call.data == 'pricerent_two':
+        async with state.proxy() as data:
+            data['money'] = '500-700'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
+    elif call.data == 'pricerent_three':
+        async with state.proxy() as data:
+            data['money'] = '700-1000'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
+    elif call.data == 'pricerent_four':
+        async with state.proxy() as data:
+            data['money'] = '1000-1500'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
+    elif call.data == 'pricerent_five':
+        async with state.proxy() as data:
+            data['money'] = 'Выше 1500'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
+    elif call.data == 'pricerent_back':
+        await state.finish()
+        await Estate.rooms.set()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
+        
 
 # Результат третьего вопроса
-
-
-@dp.message_handler(state=Estate.area)
-async def third_question(message: types.Message, state: FSMContext):
-    if message.chat.type == 'private':
+@dp.callback_query_handler(state=Estate.area, text_contains="area")
+async def third_question(call: types.CallbackQuery, state=FSMContext):
+    if call.data == 'area_one':
         async with state.proxy() as data:
-            data['area'] = message.text
-        if data['area'] == "Суворовский" or data['area'] == "Приморский" or data['area'] == "Киевский" or data['area'] == "Малиновский":
-            await Estate.next()
-            await bot.send_message(message.from_user.id, "Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время", reply_markup=kb.contact_markup)
-        else:
-            await message.reply("Вы дали некорректый ответ, пожалуйста нажмите на кнопку!", reply_markup=kb.area_markup)
+            data['area'] = "Cуворовский"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+    elif call.data == 'area_two':
+        async with state.proxy() as data:
+            data['area'] = "Приморский"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+    elif call.data == 'area_three':
+        async with state.proxy() as data:
+            data['area'] = "Киевский"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.send_message(call.from_user.id, 'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+    if call.data == 'area_four':
+        async with state.proxy() as data:
+            data['area'] = "Малиновский"
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+    if call.data == 'area_back':
+        await state.finish()
+        await Estate.money.set()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
+        
+        
+
 
 # Запрос контакта
 

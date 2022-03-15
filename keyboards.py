@@ -44,7 +44,7 @@ about_markup = InlineKeyboardMarkup(row_width=2).add(btnSite, btnAboutBack)
 # Раздел Подобрать жилье
 
 btnBuy = InlineKeyboardButton(
-    "Купить недвижимость", callback_data='estate_buy')
+    "Приобрести недвижимость", callback_data='estate_buy')
 btnSell = InlineKeyboardButton(
     "Продать недвижимость", callback_data='estate_sell')
 btnRent = InlineKeyboardButton("Снять жилье", callback_data='estate_rent')
@@ -65,15 +65,37 @@ btnRoomBack = InlineKeyboardButton("◀ Назад", callback_data='room_back')
 rooms_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
     btnRoomOne, btnRoomTwo, btnRoomThree, btnRoomFour, btnRoomBack)
 
+# Клавиатура аренды
+btnRentOne = InlineKeyboardButton("350-500", callback_data="pricerent_one")
+btnRentTwo = InlineKeyboardButton("500-700", callback_data="pricerent_two")
+btnRentThree = InlineKeyboardButton(
+    "700-1000", callback_data="pricerent_three")
+btnRentFour = InlineKeyboardButton("1000-1500", callback_data="pricerent_four")
+btnRentFive = InlineKeyboardButton("Выше 1500", callback_data="pricerent_five")
+btnRentBack =  InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
+rent_markup = InlineKeyboardMarkup(
+    resize_keyboard=True).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
+
+# Клавиатура продажи
+btnBuyOne = InlineKeyboardButton("25000-45000", callback_data='pricebuy_one')
+btnBuyTwo = InlineKeyboardButton("45000-65000", callback_data='pricebuy_two')
+btnBuyThree = InlineKeyboardButton("65000-90000", callback_data='pricebuy_three')
+btnBuyFour = InlineKeyboardButton("90000-130000", callback_data='pricebuy_four')
+btnBuyFive = InlineKeyboardButton("130000-250000", callback_data='pricebuy_five')
+btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
+buy_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+    btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
+    
 # Выбор районов
 
-suv_area = KeyboardButton("Суворовский")
-prim_area = KeyboardButton("Приморский")
-kiev_area = KeyboardButton("Киевский")
-malin_area = KeyboardButton("Малиновский")
+btnSuvArea = InlineKeyboardButton("Суворовский", callback_data='area_one')
+btnPrimArea = InlineKeyboardButton("Приморский", callback_data='area_two')
+btnKievArea = InlineKeyboardButton("Киевский", callback_data='area_three')
+btnMalinArea = InlineKeyboardButton("Малиновский", callback_data='area_four')
+btnAreaBack = InlineKeyboardButton("◀ Назад", callback_data="area_back")
 
-area_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
-    suv_area, prim_area, kiev_area, malin_area)
+area_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+    btnSuvArea, btnPrimArea, btnKievArea ,btnMalinArea, btnAreaBack)
 
 
 # Клавиатура заказа звонка
@@ -82,23 +104,7 @@ cancel_order = KeyboardButton("Назад")
 call_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(order_call, cancel_order)
 
-# Клавиатура аренды
-price_rent_one = KeyboardButton("350-500")
-price_rent_two = KeyboardButton("500-700")
-price_rent_three = KeyboardButton("700-1000")
-price_rent_four = KeyboardButton("1000-1500")
-price_rent_five = KeyboardButton("Выше 1500")
-rent_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
-    price_rent_one, price_rent_two, price_rent_three, price_rent_four, price_rent_five)
 
-# Клавиатура продажи
-price_buy_one = KeyboardButton("25000-45000")
-price_buy_two = KeyboardButton("45000-65000")
-price_buy_three = KeyboardButton("65000-90000")
-price_buy_four = KeyboardButton("90000-130000")
-price_buy_five = KeyboardButton("130000-250000")
-buy_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
-    price_buy_one, price_buy_two, price_buy_three, price_buy_four, price_buy_five)
 
 # Запрос контакта
 call_back_btn = KeyboardButton("❌ Отмена")

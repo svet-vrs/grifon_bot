@@ -40,6 +40,6 @@ async def sql_delete_command(user_id, message: types.Message, state):
         base.commit()
         del_check = True
     else:
-        await message.reply("Заявки с таким ID не существует!", reply_markup=kb.admin_markup)
+        await message.reply("Заявки с таким ID не существует!", reply_markup=kb.admin_main_markup)
         await state.finish()
         del_check = False
