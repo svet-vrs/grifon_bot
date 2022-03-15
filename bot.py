@@ -86,15 +86,15 @@ async def make_changes_command(message: types.Message):
 
 @dp.callback_query_handler(text_contains="admin")
 async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
-    await bot.delete_message(call.from_user.id, call.message.message_id)
     if call.data == "admin_delete":
         await Admin.delete_id.set()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Введите ID заявки, которую нужно удалить:', reply_markup=kb.admin_sub_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                   text='Введите ID заявки, которую нужно удалить:', reply_markup=kb.admin_sub_markup)
     elif call.data == 'admin_exit':
         await state.finish()
         await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
-        await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
 # Команда отменад
 
@@ -151,27 +151,26 @@ async def delete_request(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['start', 'help'], state=None)
 async def welcome(message: types.Message):
     if message.chat.type == 'private':
-        await bot.send_sticker(message.from_user.id, r'CAACAgIAAxkBAAEDWy9hnqt1ch_H4nLtqTSEW6gF4pmgzQACkxcAAspJ0Eh8w0UdKNUtnSIE')
-        await bot.send_message(message.from_user.id, "Добро пожаловать, " + message.from_user.first_name + " 👋\nЯ - <b>твой личный ассистент Phoenix</b>, Мы организация, предоставляющая услуги быстрого и качественного подбора недвижимости!",
+        await bot.send_sticker(message.from_user.id, r'CAACAgIAAxkBAAEEKuxiMHggQNoJKse-Kg4aQkbmTCXEmgACthUAAkwaiUmFljrdCwZhOCME')
+        await bot.send_message(message.from_user.id, "Добро пожаловать, " + message.from_user.first_name + " 👋\nЯ - <b>твой личный ассистент Grifon</b>, Мы организация, предоставляющая услуги быстрого и качественного подбора недвижимости!",
                                parse_mode='html', reply_markup=kb.menu_markup)
 
-# Главное меню: реакция на кнопки
+# Главное меню: реакция на кнопкия
 
 
 @dp.callback_query_handler(text_contains="menu")
 async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
-    await bot.delete_message(call.from_user.id, call.message.message_id)
     if call.data == "menu_about":
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Агенство недвижимости Грифон является гарантией качества и надежности для наших клиентов. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы, множество коммерческих помещений и эксклюзивных предложений от застройщиков нашего города', reply_markup=kb.about_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Агенство недвижимости Грифон является гарантией качества и надежности для наших клиентов. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы, множество коммерческих помещений и эксклюзивных предложений от застройщиков нашего города', reply_markup=kb.about_markup)
     elif call.data == 'menu_estate':
         await bot.answer_callback_query(call.id)
         await Estate.estates.set()
-        await bot.send_message(call.from_user.id, 'Что вас интересует?', reply_markup=kb.estate_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Что вас интересует?', reply_markup=kb.estate_markup)
     if call.data == 'menu_managers':
         await bot.answer_callback_query(call.id)
         await Admin.order_phone_num.set()
-        await bot.send_message(call.from_user.id, 'Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер.', reply_markup=kb.contact_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер.', reply_markup=kb.contact_markup)
 
 # Главное меню - Менеджеры: реакция на отправленный контакт
 
@@ -207,26 +206,25 @@ async def check_call_request(message: types.Message, state=FSMContext):
 
 @dp.callback_query_handler(text="about_back")
 async def check_call_request(call: types.CallbackQuery, state=FSMContext):
-    await bot.delete_message(call.from_user.id, call.message.message_id)
     await bot.answer_callback_query(call.id)
-    await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
 
 # Главное меню - Подобрать жилье: реакция на кнопки
 
 @dp.callback_query_handler(state=Estate.estates, text_contains="estate")
 async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
-    await bot.delete_message(call.from_user.id, call.message.message_id)
     if call.data == "estate_buy":
         async with state.proxy() as data:
             data['user_id'] = call.from_user.id
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
-            data['estates'] = "Приобрести недвижимость"
+            data['estates'] = "Купить недвижимость"
+        print(data['estates'])
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
     elif call.data == "estate_sell":
         async with state.proxy() as data:
             data['user_id'] = call.from_user.id
@@ -236,7 +234,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
             data['estates'] = "Продать недвижимость"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
     if call.data == "estate_rent":
         async with state.proxy() as data:
             data['user_id'] = call.from_user.id
@@ -246,7 +244,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
             data['estates'] = "Снять жилье"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
     elif call.data == "estate_rent_out":
         async with state.proxy() as data:
             data['user_id'] = call.from_user.id
@@ -256,33 +254,30 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
             data['estates'] = "Сдать в аренду жилье"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, 'Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
     if call.data == 'estate_back':
         await state.finish()
         await bot.answer_callback_query(call.id)
-        await bot.send_message(call.from_user.id, greeting, parse_mode='html', reply_markup=kb.menu_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
 
 # Главное меню - Подобрать жилье - Кол-во комнат: реакция на кнопки
 
-@dp.message_handler(state=Estate.rooms)
-async def first_question(message: types.Message, state: FSMContext):
-    if message.chat.type == 'private':
-        async with state.proxy() as data:
-            data['rooms'] = message.text
-        if message.text != "Назад":
-            if data['rooms'] == "1" or data['rooms'] == "2" or data['rooms'] == "3" or data['rooms'] == "4+":
-                await Estate.next()
-                if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
-                    await message.reply("На какой бюджет в USD💲 вы расчитываете?", reply_markup=kb.buy_markup)
-                elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
-                    await message.reply("На какую сумму в USD💲 вы расчитываете?", reply_markup=kb.rent_markup)
-            else:
-                await message.reply("Вы дали некорректый ответ, пожалуйста нажмите на кнопку!", reply_markup=kb.rooms_markup)
-        else:
-            await state.finish()
-            await message.reply('Вы отменили действие', reply_markup=kb.menu_markup)
-
+# @dp.callback_query_handler(state=Estate.rooms, text_contains="room")
+# async def first_question(call: types.CallbackQuery, state=FSMContext):
+#     async with state.proxy() as data:
+#             data['rooms'] = call.text
+#     await bot.delete_message(call.from_user.id, call.message.message_id)
+#     if call.data == "estate_buy":
+#         async with state.proxy() as data:
+#             data['user_id'] = call.from_user.id
+#         async with state.proxy() as data:
+#             data['name'] = call.from_user.first_name
+#         async with state.proxy() as data:
+#             data['estates'] = "Приобрести недвижимость"
+#         await Estate.next()
+#         await bot.answer_callback_query(call.id)
+#         await bot.send_message(call.from_user.id, 'Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
 # Результат второго вопроса покупки/аренды жилья
 
 

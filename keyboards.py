@@ -32,7 +32,7 @@ btnManagers = InlineKeyboardButton(
     "📱 Менеджеры", callback_data='menu_managers')
 btnCatalog = InlineKeyboardButton(
     "🏘 Каталог объектов", url='https://www.olx.ua/nedvizhimost/od/')
-menu_markup = InlineKeyboardMarkup(row_width=2).add(
+menu_markup = InlineKeyboardMarkup(row_width=1).add(
     btnAbout, btnEstate, btnManagers, btnCatalog)
 
 # Раздел О нас
