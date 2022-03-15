@@ -28,6 +28,9 @@ phone_number = ""
 ID = None
 disc = ""
 greeting = 'Я - <b>твой личный ассистент Grifon</b>, Мы организация, предоставляющая услуги быстрого и качественного подбора недвижимости!'
+order_name = ""
+order_phone_num = ""
+bid_text = ""
 
 # Взаимодействие с таблицей
 
@@ -95,6 +98,17 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
         await state.finish()
         await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kb.menu_markup)
+
+
+@dp.callback_query_handler(text="bid_connect")
+async def connect_button(call: types.CallbackQuery, state=FSMContext):
+    global bid_text
+    await bot.answer_callback_query(call.id)
+    await bot.delete_message(chat_id=config.CHAT_ID, message_id=call.message.message_id)
+    bid_text_admin = bid_text+"\nЗаявку принял(а): <b>"+str(call.from_user.first_name)+"</b>"
+    await bot.send_message(chat_id=config.CHAT_ID, text=bid_text_admin, parse_mode='html')
+
+
 
 # Команда отменад
 
@@ -170,7 +184,8 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
     if call.data == 'menu_managers':
         await bot.answer_callback_query(call.id)
         await Admin.order_phone_num.set()
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер.', reply_markup=kb.contact_markup)
+        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.send_message(call.from_user.id, 'Тут вы можете оставить свой номер и в течении нескольких минут с вами свяжется менеджер.', reply_markup=kb.contact_markup)
 
 # Главное меню - Менеджеры: реакция на отправленный контакт
 
@@ -178,18 +193,20 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
 async def create_call_order(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
-        async with state.proxy() as data:
-            data['order_name'] = message.from_user.first_name
-        async with state.proxy() as data:
-            data['order_phone_num'] = message.contact.phone_number
-        phone = data['order_phone_num']
+        global order_name, order_phone_num, bid_text
+        order_name = message.from_user.first_name
+        order_phone_num = message.contact.phone_number
+        phone = order_phone_num
         if phone.startswith("+"):
             order_num = str(phone)
         else:
             order_num = "+"+str(phone)
+        bid_text = "Поступила заявка на звонок \nФИО: "+str(order_name)+"\nНомер: "+order_num+""
         await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
-        await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['order_name'])+"\nНомер: "+order_num, parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        await bot.send_message(chat_id=config.CHAT_ID, text=bid_text, parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
         await state.finish()
+        order_name = ""
+        order_phone_num = ""
 
 # Главное меню - Менеджеры: реакция на кнопку назад
 
