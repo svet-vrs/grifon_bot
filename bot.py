@@ -1,5 +1,6 @@
 from tabnanny import check
 import config
+import random
 import os
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
@@ -93,7 +94,7 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
         await Admin.delete_id.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                   text='Введите ID заявки, которую нужно удалить:', reply_markup=kb.admin_sub_markup)
+                                    text='Введите ID заявки, которую нужно удалить:', reply_markup=kb.admin_sub_markup)
     elif call.data == 'admin_exit':
         await state.finish()
         await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
@@ -101,18 +102,16 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
 
 
 @dp.callback_query_handler(text="bid_connect")
-async def connect_button(call: types.CallbackQuery, state=FSMContext):
-    global bid_text
+async def connect_button(call: types.CallbackQuery):
+    bid_msg_id = call.message.message_id
+    await sqlite_db.sql_view_call_command(bid_msg_id)
     await bot.answer_callback_query(call.id)
-    await bot.delete_message(chat_id=config.CHAT_ID, message_id=call.message.message_id)
-    bid_text_admin = bid_text+"\nЗаявку принял(а): <b>"+str(call.from_user.first_name)+"</b>"
-    await bot.send_message(chat_id=config.CHAT_ID, text=bid_text_admin, parse_mode='html')
-
+    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="Поступила заявка на звонок \nФИО: "+str(sqlite_db.call_name)+"\nНомер: "+str(sqlite_db.call_phone)+"\nЗаявку принял(а): "+str(call.from_user.first_name)+"", parse_mode='html')
+    sqlite_db.call_name = ""
+    sqlite_db.call_phone = ""
 
 
 # Команда отменад
-
-
 @dp.message_handler(lambda message: message.text == "Отмена удаления", state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
     if message.chat.type == 'private':
@@ -141,10 +140,10 @@ async def delete_request(message: types.Message, state: FSMContext):
                     response = service.update(spreadsheetId=SAMPLE_SPREADSHEET_ID,
                                               range=range_,
                                               valueInputOption='RAW', body=array).execute()
-                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_markup)
+                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
                     await state.finish()
                 else:
-                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_markup)
+                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
                     await state.finish()
             else:
                 if sqlite_db.parse != []:
@@ -193,20 +192,18 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
 async def create_call_order(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
-        global order_name, order_phone_num, bid_text
-        order_name = message.from_user.first_name
-        order_phone_num = message.contact.phone_number
-        phone = order_phone_num
-        if phone.startswith("+"):
-            order_num = str(phone)
-        else:
-            order_num = "+"+str(phone)
-        bid_text = "Поступила заявка на звонок \nФИО: "+str(order_name)+"\nНомер: "+order_num+""
+        async with state.proxy() as data:
+            data['id'] = random.randint(1000, 9999)
+        async with state.proxy() as data:
+            data['name'] = message.from_user.first_name
+        async with state.proxy() as data:
+            data['phone_num'] = message.contact.phone_number
         await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
-        await bot.send_message(chat_id=config.CHAT_ID, text=bid_text, parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        msg = await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['name'])+"\nНомер: "+(data['phone_num']), parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        async with state.proxy() as data:
+            data['message_id'] = msg.message_id
+        await sqlite_db.sql_add_call_command(state)
         await state.finish()
-        order_name = ""
-        order_phone_num = ""
 
 # Главное меню - Менеджеры: реакция на кнопку назад
 
@@ -233,7 +230,7 @@ async def check_call_request(call: types.CallbackQuery, state=FSMContext):
 async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
     if call.data == "estate_buy":
         async with state.proxy() as data:
-            data['user_id'] = call.from_user.id
+            data['user_id'] = random.randint(1000, 9999)
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
@@ -243,7 +240,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
     elif call.data == "estate_sell":
         async with state.proxy() as data:
-            data['user_id'] = call.from_user.id
+            data['user_id'] = random.randint(1000, 9999)
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
@@ -253,7 +250,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
     if call.data == "estate_rent":
         async with state.proxy() as data:
-            data['user_id'] = call.from_user.id
+            data['user_id'] = random.randint(1000, 9999)
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
@@ -263,7 +260,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
     elif call.data == "estate_rent_out":
         async with state.proxy() as data:
-            data['user_id'] = call.from_user.id
+            data['user_id'] = random.randint(1000, 9999)
         async with state.proxy() as data:
             data['name'] = call.from_user.first_name
         async with state.proxy() as data:
@@ -328,6 +325,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
 
 # Главное меню - Подобрать жилье - Кол-во комнат - Цена: реакция на кнопки(покупка)
 
+
 @dp.callback_query_handler(state=Estate.money, text_contains="pricebuy")
 async def second_question_buy(call: types.CallbackQuery, state=FSMContext):
     if call.data == 'pricebuy_one':
@@ -365,10 +363,9 @@ async def second_question_buy(call: types.CallbackQuery, state=FSMContext):
         await Estate.rooms.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
-    
-        
-                            
-#Главное меню - Подобрать жилье - Кол-во комнат - Цена: реакция на кнопки(аренда)
+
+
+# Главное меню - Подобрать жилье - Кол-во комнат - Цена: реакция на кнопки(аренда)
 @dp.callback_query_handler(state=Estate.money, text_contains="pricerent")
 async def second_question_rent(call: types.CallbackQuery, state=FSMContext):
     if call.data == 'pricerent_one':
@@ -406,7 +403,7 @@ async def second_question_rent(call: types.CallbackQuery, state=FSMContext):
         await Estate.rooms.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
-        
+
 
 # Результат третьего вопроса
 @dp.callback_query_handler(state=Estate.area, text_contains="area")
@@ -417,14 +414,14 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.delete_message(call.from_user.id, call.message.message_id)
-        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+        await bot.send_message(call.from_user.id, 'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
     elif call.data == 'area_two':
         async with state.proxy() as data:
             data['area'] = "Приморский"
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.delete_message(call.from_user.id, call.message.message_id)
-        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+        await bot.send_message(call.from_user.id, 'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
     elif call.data == 'area_three':
         async with state.proxy() as data:
             data['area'] = "Киевский"
@@ -438,14 +435,12 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.delete_message(call.from_user.id, call.message.message_id)
-        await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
+        await bot.send_message(call.from_user.id, 'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
     if call.data == 'area_back':
         await state.reset_state(with_data=False)
         await Estate.money.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)
-        
-        
 
 
 # Запрос контакта

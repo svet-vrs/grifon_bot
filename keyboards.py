@@ -72,20 +72,23 @@ btnRentThree = InlineKeyboardButton(
     "700-1000", callback_data="pricerent_three")
 btnRentFour = InlineKeyboardButton("1000-1500", callback_data="pricerent_four")
 btnRentFive = InlineKeyboardButton("Выше 1500", callback_data="pricerent_five")
-btnRentBack =  InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
+btnRentBack = InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
 rent_markup = InlineKeyboardMarkup(
     resize_keyboard=True).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton("25000-45000", callback_data='pricebuy_one')
 btnBuyTwo = InlineKeyboardButton("45000-65000", callback_data='pricebuy_two')
-btnBuyThree = InlineKeyboardButton("65000-90000", callback_data='pricebuy_three')
-btnBuyFour = InlineKeyboardButton("90000-130000", callback_data='pricebuy_four')
-btnBuyFive = InlineKeyboardButton("130000-250000", callback_data='pricebuy_five')
+btnBuyThree = InlineKeyboardButton(
+    "65000-90000", callback_data='pricebuy_three')
+btnBuyFour = InlineKeyboardButton(
+    "90000-130000", callback_data='pricebuy_four')
+btnBuyFive = InlineKeyboardButton(
+    "130000-250000", callback_data='pricebuy_five')
 btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
 buy_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
     btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
-    
+
 # Выбор районов
 
 btnSuvArea = InlineKeyboardButton("Суворовский", callback_data='area_one')
@@ -95,7 +98,7 @@ btnMalinArea = InlineKeyboardButton("Малиновский", callback_data='are
 btnAreaBack = InlineKeyboardButton("◀ Назад", callback_data="area_back")
 
 area_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
-    btnSuvArea, btnPrimArea, btnKievArea ,btnMalinArea, btnAreaBack)
+    btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea, btnAreaBack)
 
 
 # Клавиатура заказа звонка
@@ -103,7 +106,6 @@ order_call = KeyboardButton("Заказать звонок")
 cancel_order = KeyboardButton("Назад")
 call_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(order_call, cancel_order)
-
 
 
 # Запрос контакта
