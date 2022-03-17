@@ -321,7 +321,7 @@ async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
             await bot.answer_callback_query(call.id)
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какую сумму в USD💲 вы расчитываете?', reply_markup=kb.rent_markup)
     if call.data == 'room_back':
-        await state.finish()
+        await state.reset_state(with_data=False)
         await Estate.estates.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Что вас интересует?', reply_markup=kb.estate_markup)
@@ -361,7 +361,7 @@ async def second_question_buy(call: types.CallbackQuery, state=FSMContext):
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Какой район вас интересует?', reply_markup=kb.area_markup)
     elif call.data == 'pricebuy_back':
-        await state.finish()
+        await state.reset_state(with_data=False)
         await Estate.rooms.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат вас интересует?', reply_markup=kb.rooms_markup)
@@ -402,7 +402,7 @@ async def second_question_rent(call: types.CallbackQuery, state=FSMContext):
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='В каком районе ваша недвижимость?', reply_markup=kb.area_markup)
     elif call.data == 'pricerent_back':
-        await state.finish()
+        await state.reset_state(with_data=False)
         await Estate.rooms.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Сколько комнат в вашей собственности?', reply_markup=kb.rooms_markup)
@@ -440,7 +440,7 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
         await bot.delete_message(call.from_user.id, call.message.message_id)
         await bot.send_message(call.from_user.id,'Предоставьте пожалуйста свой номер телефона, менеджер свяжется с вами в ближайшее время', reply_markup=kb.contact_markup)
     if call.data == 'area_back':
-        await state.finish()
+        await state.reset_state(with_data=False)
         await Estate.money.set()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='На какой бюджет в USD💲 вы расчитываете?', reply_markup=kb.buy_markup)

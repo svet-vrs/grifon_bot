@@ -4,11 +4,11 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 # Клавиатура главной админки
 btnDelete = InlineKeyboardButton(
-    "Удалить заявку", callback_data='admin_delete')
+    "🗑 Удалить заявку", callback_data='admin_delete')
 btnAdminExit = InlineKeyboardButton(
     "Выйти с панели админа", callback_data='admin_exit')
 btnBids = InlineKeyboardButton(
-    "Заявки", url='https://docs.google.com/spreadsheets/d/1vkBpMw2fpXL5yUM1jQL8IBihddWtDmwCTF1covW7dm8/edit')
+    "📖 Заявки", url='https://docs.google.com/spreadsheets/d/1vkBpMw2fpXL5yUM1jQL8IBihddWtDmwCTF1covW7dm8/edit')
 admin_main_markup = InlineKeyboardMarkup(
     row_width=2).add(btnBids, btnDelete, btnAdminExit)
 
