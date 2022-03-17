@@ -100,29 +100,31 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kb.menu_markup)
 
+# Отмена удаления заявки
+
+
+@dp.callback_query_handler(text="adminsub_cancel", state="*")
+async def cancel_handler(call: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    await bot.answer_callback_query(call.id)
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                text='Панель администратора', reply_markup=kb.admin_main_markup)
+
+# Принятие заявки в группе
+
 
 @dp.callback_query_handler(text="bid_connect")
 async def connect_button(call: types.CallbackQuery):
     bid_msg_id = call.message.message_id
     await sqlite_db.sql_view_call_command(bid_msg_id)
     await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="Поступила заявка на звонок \nФИО: "+str(sqlite_db.call_name)+"\nНомер: "+str(sqlite_db.call_phone)+"\nЗаявку принял(а): "+str(call.from_user.first_name)+"", parse_mode='html')
+    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="Поступила заявка на звонок \nФИО: "+str(sqlite_db.call_name)+"\nНомер: +"+str(sqlite_db.call_phone)+"\nКомментарий: \nЗаявку принял(а): "+str(call.from_user.first_name)+"", parse_mode='html')
+    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \nФИО: "+str(sqlite_db.call_name)+"\nНомер: +"+str(sqlite_db.call_phone)+"\nКомментарий:", parse_mode='html', reply_markup=kb.admin_bid_markup)
     sqlite_db.call_name = ""
     sqlite_db.call_phone = ""
 
 
-# Команда отменад
-@dp.message_handler(lambda message: message.text == "Отмена удаления", state="*")
-async def cancel_handler(message: types.Message, state: FSMContext):
-    if message.chat.type == 'private':
-        if message.from_user.id == ID:
-            current_state = await state.get_state()
-            if current_state is None:
-                return
-            await message.reply('Вы вышли с панели модератора,для продолжения администрирования вернитесь в час администраторов', reply_markup=ReplyKeyboardRemove())
-            await state.finish()
-
-
+# Удаление заявки
 @dp.message_handler(state=Admin.delete_id)
 async def delete_request(message: types.Message, state: FSMContext):
     if message.chat.type == 'private':
@@ -140,10 +142,10 @@ async def delete_request(message: types.Message, state: FSMContext):
                     response = service.update(spreadsheetId=SAMPLE_SPREADSHEET_ID,
                                               range=range_,
                                               valueInputOption='RAW', body=array).execute()
-                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
+                    await bot.send_message(message.from_user.id, "Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
                     await state.finish()
                 else:
-                    await message.reply("Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
+                    await bot.send_message(message.from_user.id, "Вы успешно удалили зявку с ID: " + data['delete_id'], reply_markup=kb.admin_main_markup)
                     await state.finish()
             else:
                 if sqlite_db.parse != []:
@@ -199,7 +201,7 @@ async def create_call_order(message: types.Message, state=FSMContext):
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
         await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
-        msg = await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['name'])+"\nНомер: "+(data['phone_num']), parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        msg = await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['name'])+"\nНомер: "+(data['phone_num'])+"\nКомментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
         async with state.proxy() as data:
             data['message_id'] = msg.message_id
         await sqlite_db.sql_add_call_command(state)

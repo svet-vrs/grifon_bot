@@ -22,6 +22,13 @@ admin_sub_markup = InlineKeyboardMarkup(
 btnConnect = InlineKeyboardButton(
     "✅ Принять заявку", callback_data="bid_connect")
 admin_chat_markup = InlineKeyboardMarkup().add(btnConnect)
+
+btnBidComplete = InlineKeyboardButton(
+    "✅ Выполнено", callback_data="bidmenu_finish")
+btnBidReject = InlineKeyboardButton(
+    "❌ Отказаться от заявки", callback_data="bidmenu_reject")
+admin_bid_markup = InlineKeyboardMarkup(
+    row_width=1).add(btnBidReject, btnBidComplete)
 # -------Клиентская часть-------
 
 # Главное меню
@@ -51,7 +58,7 @@ btnRent = InlineKeyboardButton("Снять жилье", callback_data='estate_re
 btnRentOut = InlineKeyboardButton(
     "Сдать в аренду жилье", callback_data='estate_rent_out')
 btnEstateBack = InlineKeyboardButton("◀ Назад", callback_data='estate_back')
-estate_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+estate_markup = InlineKeyboardMarkup(row_width=2).add(
     btnBuy, btnSell, btnRent, btnRentOut, btnEstateBack)
 
 # Выбор количества комнат
