@@ -451,19 +451,23 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
 @dp.message_handler(state=Estate.phone_num)
 async def check_call_request(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
-        if message.text == "Отмена":
+        if message.text == "❌ Отмена":
             await state.finish()
             await message.reply('Вы отменили действие', reply_markup=kb.menu_markup)
-
+            
+#результат заявки 
 
 @dp.message_handler(content_types=['contact'], state=Estate.phone_num)
 async def fourth_question(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
-        async with state.proxy() as data:
-            if 'plan' not in data.keys():
-                data['plan'] = ""
+        await Estate.next()
+        await bot.send_message(message.from_user.id, "Ваша заявка заполнена: \n\n🏠 Операция: "+str(data['estates'])+"\n🌐 Район: "+str(data['area'])+" \n🔢 Комнаты: "+str(data['rooms'])+"\n💵 Цена (дол.): "+str(data['money'])+"\n📞 Номер телефона: "+str(data['phone_num'])+"\n\nВсё верно?", reply_markup=kb.finish_markup)
+        
+@dp.callback_query_handler(state=Estate.finish, text_contains="finish")
+async def final_question(call: types.CallbackQuery, state=FSMContext):
+    if call.data == "finish_yes":
         await sqlite_db.sql_add_command(state)
         await sqlite_db.sql_parse_command()
         await clear_gs()
@@ -473,13 +477,15 @@ async def fourth_question(message: types.Message, state=FSMContext):
         response = service.update(spreadsheetId=SAMPLE_SPREADSHEET_ID,
                                   range=range_,
                                   valueInputOption='RAW',
-                                  body=array).execute()
-        if data['plan'] != "":
-            await state.finish()
-            await bot.send_message(message.from_user.id, "Поздравляем, вы получили скидку в размере 20% на услуги нашей компании!🎁", reply_markup=kb.menu_markup)
-        else:
-            await state.finish()
-            await bot.send_message(message.from_user.id, "Ваша заявка принята и вскоре будет рассмотрена ✅", reply_markup=kb.menu_markup)
+                                  body=array).execute()  
+        await state.finish()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Ваша заявка принята и вскоре будет рассмотрена ✅", reply_markup=kb.menu_markup)
+    elif call.data == "finish_no":
+        await state.reset_state(with_data=False)
+        await Estate.estates.set()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Отредактируйте вашу заявку", reply_markup=kb.estate_markup)
 
 
 # ***********************************Запуск бота***********************************

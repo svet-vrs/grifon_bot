@@ -9,6 +9,7 @@ class Estate(StatesGroup):
     money = State()
     area = State()
     phone_num = State()
+    finish = State()
     cancel = State()
 
 class Admin(StatesGroup):

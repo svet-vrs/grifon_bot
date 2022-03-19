@@ -36,7 +36,7 @@ btnAbout = InlineKeyboardButton("❔ Узнать о нас", callback_data='men
 btnEstate = InlineKeyboardButton(
     "🏡 Подобрать жилье", callback_data='menu_estate')
 btnManagers = InlineKeyboardButton(
-    "📱 Менеджеры", callback_data='menu_managers')
+    "📱 Заказать звонок", callback_data='menu_managers')
 btnCatalog = InlineKeyboardButton(
     "🏘 Каталог объектов", url='https://www.olx.ua/nedvizhimost/od/')
 menu_markup = InlineKeyboardMarkup(row_width=1).add(
@@ -58,7 +58,7 @@ btnRent = InlineKeyboardButton("Снять жилье", callback_data='estate_re
 btnRentOut = InlineKeyboardButton(
     "Сдать в аренду жилье", callback_data='estate_rent_out')
 btnEstateBack = InlineKeyboardButton("◀ Назад", callback_data='estate_back')
-estate_markup = InlineKeyboardMarkup(row_width=2).add(
+estate_markup = InlineKeyboardMarkup(row_width=1).add(
     btnBuy, btnSell, btnRent, btnRentOut, btnEstateBack)
 
 # Выбор количества комнат
@@ -81,7 +81,7 @@ btnRentFour = InlineKeyboardButton("1000-1500", callback_data="pricerent_four")
 btnRentFive = InlineKeyboardButton("Выше 1500", callback_data="pricerent_five")
 btnRentBack = InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
 rent_markup = InlineKeyboardMarkup(
-    resize_keyboard=True).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
+    resize_keyboard=True,row_width=1).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton("25000-45000", callback_data='pricebuy_one')
@@ -93,7 +93,7 @@ btnBuyFour = InlineKeyboardButton(
 btnBuyFive = InlineKeyboardButton(
     "130000-250000", callback_data='pricebuy_five')
 btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
-buy_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+buy_markup = InlineKeyboardMarkup(resize_keyboard=True,row_width=1).add(
     btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
 
 # Выбор районов
@@ -104,13 +104,13 @@ btnKievArea = InlineKeyboardButton("Киевский", callback_data='area_three
 btnMalinArea = InlineKeyboardButton("Малиновский", callback_data='area_four')
 btnAreaBack = InlineKeyboardButton("◀ Назад", callback_data="area_back")
 
-area_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+area_markup = InlineKeyboardMarkup(row_width=1).add(
     btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea, btnAreaBack)
 
 
 # Клавиатура заказа звонка
 order_call = KeyboardButton("Заказать звонок")
-cancel_order = KeyboardButton("Назад")
+cancel_order = KeyboardButton("◀ Назад")
 call_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(order_call, cancel_order)
 
@@ -120,3 +120,9 @@ call_back_btn = KeyboardButton("❌ Отмена")
 send_contact = KeyboardButton("☎️ Отправить контакт", request_contact=True)
 contact_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(send_contact, call_back_btn)
+
+
+yesbtn = InlineKeyboardButton("✅ Да", callback_data='finish_yes')
+nobtn = InlineKeyboardButton("✏ Редактировать", callback_data='finish_no')
+
+finish_markup = InlineKeyboardMarkup().add(yesbtn,nobtn)
