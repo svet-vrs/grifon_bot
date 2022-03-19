@@ -118,8 +118,8 @@ async def connect_button(call: types.CallbackQuery):
     bid_msg_id = call.message.message_id
     await sqlite_db.sql_view_call_command(bid_msg_id)
     await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="Поступила заявка на звонок \nФИО: "+str(sqlite_db.call_name)+"\nНомер: +"+str(sqlite_db.call_phone)+"\nКомментарий: \nЗаявку принял(а): "+str(call.from_user.first_name)+"", parse_mode='html')
-    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \nФИО: "+str(sqlite_db.call_name)+"\nНомер: +"+str(sqlite_db.call_phone)+"\nКомментарий:", parse_mode='html', reply_markup=kb.admin_bid_markup)
+    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n⬥ ФИО: `"+str(sqlite_db.call_name)+"`\n⬥ Номер: `"+str(sqlite_db.call_phone)+"`\n⬥ Комментарий: \n⬥ Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
+    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n⬥ ФИО: `"+str(sqlite_db.call_name)+"`\n⬥ Номер: `"+str(sqlite_db.call_phone)+"`\n⬥ Комментарий:", parse_mode='Markdown', reply_markup=kb.admin_bid_markup)
     sqlite_db.call_name = ""
     sqlite_db.call_phone = ""
 
@@ -201,7 +201,7 @@ async def create_call_order(message: types.Message, state=FSMContext):
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
         await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
-        msg = await bot.send_message(chat_id=config.CHAT_ID, text="Поступила заявка на звонок \nФИО: "+str(data['name'])+"\nНомер: "+(data['phone_num'])+"\nКомментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n⬥ ФИО: `"+str(data['name'])+"`\n⬥ Номер: `"+(data['phone_num'])+"`\n⬥ Комментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
         async with state.proxy() as data:
             data['message_id'] = msg.message_id
         await sqlite_db.sql_add_call_command(state)
