@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 class Estate(StatesGroup):
     user_id = State()    
     name = State()
-    plan = State()
+    lang = State()
     estates = State()
     rooms = State()
     money = State()
