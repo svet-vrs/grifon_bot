@@ -23,10 +23,10 @@ def sql_start():
     if base2:
         print('База2 подключена')
     base.execute(
-        'CREATE TABLE IF NOT EXISTS users(id INTEGER,name Text, contacts TEXT, estate TEXT, rooms TEXT, money TEXT, area TEXT)')
+        'CREATE TABLE IF NOT EXISTS users(id INTEGER,name Text, contacts TEXT, estate TEXT, rooms TEXT, money TEXT, area TEXT, lang TEXT)')
     base.commit()
     base2.execute(
-        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT)')
+        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT, lang TEXT)')
     base2.commit()
 
 # Добавление заявок на покупку
@@ -34,8 +34,8 @@ def sql_start():
 
 async def sql_add_command(state):
     async with state.proxy() as data:
-        cur.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?)',
-                    (data['user_id'], data['name'], data['phone_num'], data['estates'], data['rooms'], data['money'], data['area']))
+        cur.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?,?)',
+                    (data['user_id'], data['name'], data['phone_num'], data['estates'], data['rooms'], data['money'], data['area'], data['lang']))
         base.commit()
 
 # Добавление заказов на звонок
@@ -43,8 +43,8 @@ async def sql_add_command(state):
 
 async def sql_add_call_command(state):
     async with state.proxy() as data:
-        cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?)',
-                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager']))
+        cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?,?)',
+                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager'], data['lang']))
         base2.commit()
 
 
