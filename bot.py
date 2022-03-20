@@ -138,7 +138,17 @@ async def bid_menu_button(call: types.CallbackQuery):
         sqlite_db.call_name = ""
         sqlite_db.call_phone = ""
         sqlite_db.call_message = ""
-    # if call.data == "bidmenu_reject":
+    elif call.data == "bidmenu_reject":
+        await bot.answer_callback_query(call.id, text="Вы отказались от заявки!", show_alert=True)
+        await sqlite_db.sql_view2_call_command(call.from_user.id)
+        empty_manager = ""
+        await sqlite_db.sql_change_call_command(sqlite_db.call_message, empty_manager)
+        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Панель администратора', reply_markup=kb.admin_main_markup)
+        sqlite_db.call_name = ""
+        sqlite_db.call_phone = ""
+        sqlite_db.call_message = ""
 
     # Удаление заявки
 
