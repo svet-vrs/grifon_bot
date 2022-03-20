@@ -1,4 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
+from aiogram import types
 
 # -------Админская часть-------
 
@@ -81,7 +82,7 @@ btnRentFour = InlineKeyboardButton("1000-1500", callback_data="pricerent_four")
 btnRentFive = InlineKeyboardButton("Выше 1500", callback_data="pricerent_five")
 btnRentBack = InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
 rent_markup = InlineKeyboardMarkup(
-    resize_keyboard=True,row_width=1).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
+    resize_keyboard=True, row_width=1).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton("25000-45000", callback_data='pricebuy_one')
@@ -93,7 +94,7 @@ btnBuyFour = InlineKeyboardButton(
 btnBuyFive = InlineKeyboardButton(
     "130000-250000", callback_data='pricebuy_five')
 btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
-buy_markup = InlineKeyboardMarkup(resize_keyboard=True,row_width=1).add(
+buy_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
     btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
 
 # Выбор районов
@@ -125,4 +126,6 @@ contact_markup = ReplyKeyboardMarkup(
 yesbtn = InlineKeyboardButton("✅ Да", callback_data='finish_yes')
 nobtn = InlineKeyboardButton("✏ Редактировать", callback_data='finish_no')
 
-finish_markup = InlineKeyboardMarkup().add(yesbtn,nobtn)
+finish_markup = InlineKeyboardMarkup().add(yesbtn, nobtn)
+
+clear_markup = types.ReplyKeyboardRemove()

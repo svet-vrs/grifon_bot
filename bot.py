@@ -118,8 +118,8 @@ async def connect_button(call: types.CallbackQuery):
     bid_msg_id = call.message.message_id
     await sqlite_db.sql_view_call_command(bid_msg_id)
     await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n⬥ ФИО: `"+str(sqlite_db.call_name)+"`\n⬥ Номер: `"+str(sqlite_db.call_phone)+"`\n⬥ Комментарий: \n⬥ Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
-    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n⬥ ФИО: `"+str(sqlite_db.call_name)+"`\n⬥ Номер: `"+str(sqlite_db.call_phone)+"`\n⬥ Комментарий:", parse_mode='Markdown', reply_markup=kb.admin_bid_markup)
+    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий: \n🔸 Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
+    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий:", parse_mode='Markdown', reply_markup=kb.admin_bid_markup)
     sqlite_db.call_name = ""
     sqlite_db.call_phone = ""
 
@@ -200,8 +200,10 @@ async def create_call_order(message: types.Message, state=FSMContext):
             data['name'] = message.from_user.first_name
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
-        await message.answer("Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
-        msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n⬥ ФИО: `"+str(data['name'])+"`\n⬥ Номер: `"+(data['phone_num'])+"`\n⬥ Комментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
+        await bot.send_message(message.from_user.id, "Загрузка...", reply_markup=kb.clear_markup)
+        await bot.delete_message(message.from_user.id, message.message_id + 1)
+        await bot.send_message(message.from_user.id, "Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
+        msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(data['name'])+"`\n🔸 Номер: `"+(data['phone_num'])+"`\n🔹 Комментарий: ", parse_mode='Markdown', reply_markup=kb.admin_chat_markup)
         async with state.proxy() as data:
             data['message_id'] = msg.message_id
         await sqlite_db.sql_add_call_command(state)
@@ -454,8 +456,9 @@ async def check_call_request(message: types.Message, state=FSMContext):
         if message.text == "❌ Отмена":
             await state.finish()
             await message.reply('Вы отменили действие', reply_markup=kb.menu_markup)
-            
-#результат заявки 
+
+# результат заявки
+
 
 @dp.message_handler(content_types=['contact'], state=Estate.phone_num)
 async def fourth_question(message: types.Message, state=FSMContext):
@@ -463,8 +466,11 @@ async def fourth_question(message: types.Message, state=FSMContext):
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
         await Estate.next()
+        await bot.send_message(message.from_user.id, "Загрузка...", reply_markup=kb.clear_markup)
+        await bot.delete_message(message.from_user.id, message.message_id + 1)
         await bot.send_message(message.from_user.id, "Ваша заявка заполнена: \n\n🏠 Операция: "+str(data['estates'])+"\n🌐 Район: "+str(data['area'])+" \n🔢 Комнаты: "+str(data['rooms'])+"\n💵 Цена (дол.): "+str(data['money'])+"\n📞 Номер телефона: "+str(data['phone_num'])+"\n\nВсё верно?", reply_markup=kb.finish_markup)
-        
+
+
 @dp.callback_query_handler(state=Estate.finish, text_contains="finish")
 async def final_question(call: types.CallbackQuery, state=FSMContext):
     if call.data == "finish_yes":
@@ -477,7 +483,7 @@ async def final_question(call: types.CallbackQuery, state=FSMContext):
         response = service.update(spreadsheetId=SAMPLE_SPREADSHEET_ID,
                                   range=range_,
                                   valueInputOption='RAW',
-                                  body=array).execute()  
+                                  body=array).execute()
         await state.finish()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Ваша заявка принята и вскоре будет рассмотрена ✅", reply_markup=kb.menu_markup)
