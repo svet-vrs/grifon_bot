@@ -122,8 +122,8 @@ async def connect_button(call: types.CallbackQuery):
     await sqlite_db.sql_view1_call_command(bid_msg_id)
     await sqlite_db.sql_change_call_command(bid_msg_id, call.from_user.id)
     await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Выбранный язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" \n🔹 Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
-    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸Выбранный язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+"", parse_mode='Markdown', reply_markup=kbru.admin_bid_markup)
+    await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" \n🔹 Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
+    await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+"", parse_mode='Markdown', reply_markup=kbru.admin_bid_markup)
     sqlite_db.call_name = ""
     sqlite_db.call_phone = ""
     sqlite_db.call_comment = ""
@@ -135,7 +135,7 @@ async def bid_menu_button(call: types.CallbackQuery):
     if call.data == "bidmenu_finish":
         await bot.answer_callback_query(call.id, text="Вы успешно завершили заявку!", show_alert=True)
         await sqlite_db.sql_view2_call_command(call.from_user.id)
-        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="Заявка выполнена \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸Выбранный язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" \n🔹 Исполнитель: `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
+        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="Заявка выполнена \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" \n🔹 Исполнитель: `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
         await sqlite_db.sql_delete_call_command(call.from_user.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text='Панель администратора', reply_markup=kbru.admin_main_markup)
@@ -149,7 +149,7 @@ async def bid_menu_button(call: types.CallbackQuery):
         await sqlite_db.sql_view2_call_command(call.from_user.id)
         empty_manager = ""
         await sqlite_db.sql_change_call_command(sqlite_db.call_message, empty_manager)
-        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸Выбранный язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" ", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
+        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Язык: "+str(sqlite_db.call_lang)+"\n🔹 Номер: "+str(sqlite_db.call_phone)+"\n🔸 Комментарий: "+str(sqlite_db.call_comment)+" ", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text='Панель администратора', reply_markup=kbru.admin_main_markup)
         sqlite_db.call_name = ""
@@ -291,7 +291,7 @@ async def create_call_order(message: types.Message, state=FSMContext):
     async with state.proxy() as data:
          data['order_comment'] = message.text
     await bot.send_message(message.from_user.id, bot_text[4], reply_markup=kb.menu_markup)
-    msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(data['name'])+"`\n🔸 Выбранный язык: "+(data['lang'])+"\n🔹 Номер: "+(data['phone_num'])+"\n🔸 Комментарий: "+(data['order_comment'])+"", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
+    msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(data['name'])+"`\n🔸 Язык: "+(data['lang'])+"\n🔹 Номер: "+(data['phone_num'])+"\n🔸 Комментарий: "+(data['order_comment'])+"", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
     async with state.proxy() as data:
         data['message_id'] = msg.message_id
     await sqlite_db.sql_add_call_command(state)
@@ -311,7 +311,7 @@ async def connect_button(call: types.CallbackQuery, state=FSMContext):
         data['order_comment'] = "-"
     await bot.answer_callback_query(call.id)
     await bot.send_message(call.from_user.id, bot_text[4], reply_markup=kb.menu_markup)
-    msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(data['name'])+"`\n🔸 Выбранный язык: "+(data['lang'])+"\n🔹 Номер: "+(data['phone_num'])+"\n🔸 Комментарий: "+(data['order_comment'])+"", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
+    msg = await bot.send_message(chat_id=config.CHAT_ID, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(data['name'])+"`\n🔸 Язык: "+(data['lang'])+"\n🔹 Номер: "+(data['phone_num'])+"\n🔸 Комментарий: "+(data['order_comment'])+"", parse_mode='Markdown', reply_markup=kbru.admin_chat_markup)
     async with state.proxy() as data:
         data['message_id'] = msg.message_id
     await sqlite_db.sql_add_call_command(state)

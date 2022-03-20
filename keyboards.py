@@ -33,8 +33,8 @@ admin_bid_markup = InlineKeyboardMarkup(
 # -------Клиентская часть-------
 
 # Запрос языка
-btnRus = InlineKeyboardButton("🚢 Русский язык", callback_data='lang_ru')
-btnUA = InlineKeyboardButton("​💙 Украинский язык 💛", callback_data='lang_ua')
+btnRus = InlineKeyboardButton("🇷🇺 Русский язык", callback_data='lang_ru')
+btnUA = InlineKeyboardButton("​🇺🇦 Украинский язык", callback_data='lang_ua')
 lang_markup = InlineKeyboardMarkup(row_width=2).add(btnUA, btnRus)
 
 # Главное меню
