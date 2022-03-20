@@ -16,3 +16,4 @@ class Admin(StatesGroup):
     delete_id = State()
     order_name = State()
     order_phone_num = State()
+    order_comment = State()

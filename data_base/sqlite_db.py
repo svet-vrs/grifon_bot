@@ -10,6 +10,8 @@ update_check = False
 call_name = ""
 call_phone = ""
 call_message = ""
+call_comment = ""
+call_lang = ""
 
 
 def sql_start():
@@ -26,7 +28,7 @@ def sql_start():
         'CREATE TABLE IF NOT EXISTS users(id INTEGER,name Text, contacts TEXT, estate TEXT, rooms TEXT, money TEXT, area TEXT, lang TEXT)')
     base.commit()
     base2.execute(
-        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT, lang TEXT)')
+        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT, lang TEXT, comment TEXT)')
     base2.commit()
 
 # Добавление заявок на покупку
@@ -43,13 +45,13 @@ async def sql_add_command(state):
 
 async def sql_add_call_command(state):
     async with state.proxy() as data:
-        cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?,?)',
-                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager'], data['lang']))
+        cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?,?,?)',
+                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager'], data['lang'], data['order_comment']))
         base2.commit()
 
 
 async def sql_view1_call_command(bid_id):
-    global call_name, call_phone
+    global call_name, call_phone, call_comment, call_lang
     revision = cur2.execute(
         "SELECT * FROM calls WHERE message == ?", [bid_id]).fetchone()
     if revision is not None:
@@ -57,12 +59,18 @@ async def sql_view1_call_command(bid_id):
             bid_id]).fetchone()
         phone = cur2.execute("SELECT contacts FROM calls WHERE message == ?", [
             bid_id]).fetchone()
+        comment = cur2.execute("SELECT comment FROM calls WHERE message == ?", [
+            bid_id]).fetchone()
+        lang = cur2.execute("SELECT lang FROM calls WHERE message == ?", [
+            bid_id]).fetchone()
         call_name = name[0]
         call_phone = phone[0]
+        call_comment = comment[0]
+        call_lang = lang[0]
 
 
 async def sql_view2_call_command(manager_id):
-    global call_name, call_phone, call_message
+    global call_name, call_phone, call_message, call_comment, call_lang
     revision = cur2.execute(
         "SELECT * FROM calls WHERE manager == ?", [manager_id]).fetchone()
     if revision is not None:
@@ -72,9 +80,15 @@ async def sql_view2_call_command(manager_id):
             manager_id]).fetchone()
         message = cur2.execute("SELECT message FROM calls WHERE manager == ?", [
                                manager_id]).fetchone()
+        comment = cur2.execute("SELECT comment FROM calls WHERE manager == ?", [
+            manager_id]).fetchone()
+        lang = cur2.execute("SELECT lang FROM calls WHERE manager == ?", [
+            manager_id]).fetchone()
         call_name = name[0]
         call_phone = phone[0]
         call_message = message[0]
+        call_comment = comment[0]
+        call_lang = lang[0]
 
 
 async def sql_change_call_command(bid_id, manager_id):

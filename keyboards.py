@@ -128,9 +128,15 @@ contact_markup = ReplyKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(send_contact, call_back_btn)
 
 
+# Запрос верности введенного
 yesbtn = InlineKeyboardButton("✅ Да", callback_data='finish_yes')
 nobtn = InlineKeyboardButton("✏ Редактировать", callback_data='finish_no')
 
 finish_markup = InlineKeyboardMarkup().add(yesbtn, nobtn)
 
+# Удаление клавиатуры
 clear_markup = types.ReplyKeyboardRemove()
+
+# комментарий
+btnSkip = InlineKeyboardButton("⏭ Пропустить", callback_data='following_btn')
+comment_markup = InlineKeyboardMarkup(row_width=1).add(btnSkip)
