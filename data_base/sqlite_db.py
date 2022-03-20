@@ -1,3 +1,4 @@
+from email import message
 import sqlite3 as sq
 from aiogram import types
 import keyboards as kb
@@ -8,6 +9,7 @@ del_check = False
 update_check = False
 call_name = ""
 call_phone = ""
+call_message = ""
 
 
 def sql_start():
@@ -20,10 +22,11 @@ def sql_start():
         print('База1 подключена')
     if base2:
         print('База2 подключена')
-    base.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER,name Text, contacts TEXT, estate TEXT, rooms TEXT, money TEXT, area TEXT)')
+    base.execute(
+        'CREATE TABLE IF NOT EXISTS users(id INTEGER,name Text, contacts TEXT, estate TEXT, rooms TEXT, money TEXT, area TEXT)')
     base.commit()
     base2.execute(
-        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT)')
+        'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT)')
     base2.commit()
 
 # Добавление заявок на покупку
@@ -40,12 +43,12 @@ async def sql_add_command(state):
 
 async def sql_add_call_command(state):
     async with state.proxy() as data:
-        cur2.execute('INSERT INTO calls VALUES (?,?,?,?)',
-                     (data['id'], data['name'], data['phone_num'], data['message_id']))
+        cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?)',
+                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager']))
         base2.commit()
 
 
-async def sql_view_call_command(bid_id):
+async def sql_view1_call_command(bid_id):
     global call_name, call_phone
     revision = cur2.execute(
         "SELECT * FROM calls WHERE message == ?", [bid_id]).fetchone()
@@ -56,6 +59,33 @@ async def sql_view_call_command(bid_id):
             bid_id]).fetchone()
         call_name = name[0]
         call_phone = phone[0]
+
+
+async def sql_view2_call_command(manager_id):
+    global call_name, call_phone, call_message
+    revision = cur2.execute(
+        "SELECT * FROM calls WHERE manager == ?", [manager_id]).fetchone()
+    if revision is not None:
+        name = cur2.execute("SELECT name FROM calls WHERE manager == ?", [
+            manager_id]).fetchone()
+        phone = cur2.execute("SELECT contacts FROM calls WHERE manager == ?", [
+            manager_id]).fetchone()
+        message = cur2.execute("SELECT message FROM calls WHERE manager == ?", [
+                               manager_id]).fetchone()
+        call_name = name[0]
+        call_phone = phone[0]
+        call_message = message[0]
+
+
+async def sql_change_call_command(bid_id, manager_id):
+    cur2.execute("UPDATE calls SET manager == ? WHERE message == ?",
+                 (manager_id, bid_id))
+    base2.commit()
+
+
+async def sql_delete_call_command(manager_id):
+    cur2.execute('DELETE FROM calls WHERE manager == ?', [manager_id])
+    base2.commit()
 
 
 async def sql_parse_command():

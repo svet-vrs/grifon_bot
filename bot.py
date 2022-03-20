@@ -110,13 +110,15 @@ async def cancel_handler(call: types.CallbackQuery, state: FSMContext):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                 text='Панель администратора', reply_markup=kb.admin_main_markup)
 
+
 # Принятие заявки в группе
 
 
 @dp.callback_query_handler(text="bid_connect")
 async def connect_button(call: types.CallbackQuery):
     bid_msg_id = call.message.message_id
-    await sqlite_db.sql_view_call_command(bid_msg_id)
+    await sqlite_db.sql_view1_call_command(bid_msg_id)
+    await sqlite_db.sql_change_call_command(bid_msg_id, call.from_user.id)
     await bot.answer_callback_query(call.id)
     await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=call.message.message_id, text="🔔 Поступила заявка на звонок \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий: \n🔸 Заявку принял(а): `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
     await bot.send_message(call.from_user.id, "Вы приняли заявку на звонок: \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий:", parse_mode='Markdown', reply_markup=kb.admin_bid_markup)
@@ -124,7 +126,23 @@ async def connect_button(call: types.CallbackQuery):
     sqlite_db.call_phone = ""
 
 
-# Удаление заявки
+@dp.callback_query_handler(text_contains="bidmenu")
+async def bid_menu_button(call: types.CallbackQuery):
+    if call.data == "bidmenu_finish":
+        await bot.answer_callback_query(call.id, text="Вы успешно завершили заявку!", show_alert=True)
+        await sqlite_db.sql_view2_call_command(call.from_user.id)
+        await bot.edit_message_text(chat_id=config.CHAT_ID, message_id=sqlite_db.call_message, text="✅ Заявка выполнена \n🔹 ФИО: `"+str(sqlite_db.call_name)+"`\n🔸 Номер: `"+str(sqlite_db.call_phone)+"`\n🔹 Комментарий: \n🔸 Исполнитель: `"+str(call.from_user.first_name)+"`", parse_mode='Markdown')
+        await sqlite_db.sql_delete_call_command(call.from_user.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Панель администратора', reply_markup=kb.admin_main_markup)
+        sqlite_db.call_name = ""
+        sqlite_db.call_phone = ""
+        sqlite_db.call_message = ""
+    # if call.data == "bidmenu_reject":
+
+    # Удаление заявки
+
+
 @dp.message_handler(state=Admin.delete_id)
 async def delete_request(message: types.Message, state: FSMContext):
     if message.chat.type == 'private':
@@ -200,6 +218,8 @@ async def create_call_order(message: types.Message, state=FSMContext):
             data['name'] = message.from_user.first_name
         async with state.proxy() as data:
             data['phone_num'] = message.contact.phone_number
+        async with state.proxy() as data:
+            data['manager'] = ""
         await bot.send_message(message.from_user.id, "Загрузка...", reply_markup=kb.clear_markup)
         await bot.delete_message(message.from_user.id, message.message_id + 1)
         await bot.send_message(message.from_user.id, "Вы заказали звонок,в скором времени с вами свяжутся ✅", reply_markup=kb.menu_markup)
