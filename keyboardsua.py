@@ -75,29 +75,29 @@ rooms_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
     btnRoomOne, btnRoomTwo, btnRoomThree, btnRoomFour, btnRoomBack)
 
 # Клавиатура аренды
-btnRentOne = InlineKeyboardButton("350 - 500", callback_data="pricerent_one")
-btnRentTwo = InlineKeyboardButton("500 - 700", callback_data="pricerent_two")
+btnRentOne = InlineKeyboardButton("До 350 $", callback_data="pricerent_one")
+btnRentTwo = InlineKeyboardButton("350 - 500 $", callback_data="pricerent_two")
 btnRentThree = InlineKeyboardButton(
-    "700 - 1000", callback_data="pricerent_three")
+    "500 - 700 $", callback_data="pricerent_three")
 btnRentFour = InlineKeyboardButton(
-    "1000 - 1500", callback_data="pricerent_four")
+    "700 - 1000 $", callback_data="pricerent_four")
 btnRentFive = InlineKeyboardButton(
-    "Вище за 1500", callback_data="pricerent_five")
+    "Вище за 1000 $", callback_data="pricerent_five")
 btnRentBack = InlineKeyboardButton("◀ Назад", callback_data="pricerent_back")
 rent_markup = InlineKeyboardMarkup(
     resize_keyboard=True, row_width=1).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton(
-    "25.000 - 45.000", callback_data='pricebuy_one')
+    "25.000 - 45.000 $", callback_data='pricebuy_one')
 btnBuyTwo = InlineKeyboardButton(
-    "45.000 - 65.000", callback_data='pricebuy_two')
+    "45.000 - 65.000 $", callback_data='pricebuy_two')
 btnBuyThree = InlineKeyboardButton(
-    "65.000 - 90.000", callback_data='pricebuy_three')
+    "65.000 - 90.000 $", callback_data='pricebuy_three')
 btnBuyFour = InlineKeyboardButton(
-    "90.000 - 130.000", callback_data='pricebuy_four')
+    "90.000 - 130.000 $", callback_data='pricebuy_four')
 btnBuyFive = InlineKeyboardButton(
-    "130.000 - 250.000", callback_data='pricebuy_five')
+    "130.000 - 250.000 $", callback_data='pricebuy_five')
 btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
 buy_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
     btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)

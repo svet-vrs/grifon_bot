@@ -97,11 +97,6 @@ async def sql_change_call_command(bid_id, manager_id):
     base2.commit()
 
 
-async def sql_delete_call_command(manager_id):
-    cur2.execute('DELETE FROM calls WHERE manager == ?', [manager_id])
-    base2.commit()
-
-
 async def sql_parse_command():
     global parse
     google_sheet_db = cur.execute('SELECT * FROM users').fetchall()
