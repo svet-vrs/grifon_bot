@@ -233,7 +233,7 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
         elif data['lang'] == "ENG":
             bot_text = config.LANG_ENG
             kb = kbeng
-    if call.data == "menu_about":
+    if call.data == 'menu_about':
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[0], reply_markup=kb.about_markup)
     elif call.data == 'menu_estate':
@@ -246,9 +246,7 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.delete_message(call.from_user.id, call.message.message_id)
         await bot.send_message(call.from_user.id, text=bot_text[2], reply_markup=kb.contact_markup)
 
-
 # Главное меню - Заказать звонок: реакция на отправленный контакт
-
 
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
 async def create_call_order(message: types.Message, state=FSMContext):
@@ -637,8 +635,14 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
     if call.data == 'area_back':
         await state.reset_state(with_data=False)
         await Estate.money.set()
-        await bot.answer_callback_query(call.id)
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[8], reply_markup=kb.buy_markup)
+        if data['estates'] == "Приобрести недвижимость" or data['estates'] == "Продать недвижимость":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[8], reply_markup=kb.buy_markup)
+        elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
+            await bot.answer_callback_query(call.id)
+            await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[9], reply_markup=kb.rent_markup)
+        
+        
 
 
 # Запрос контакта
@@ -739,6 +743,7 @@ async def translate_text(state:FSMContext, lang):
                 estates_info = "Rent estate"
             elif data['estates'] == "Сдать в аренду жилье":
                 estates_info = "Rent out estate"
+
             if data['area'] == "Cуворовский":
                 area_info = "Suvorov area"
             elif data['area'] == "Приморский":
@@ -748,7 +753,7 @@ async def translate_text(state:FSMContext, lang):
             elif data['area'] == "Малиновский":
                 area_info = "Malinowski area"
             elif data['area'] == "Одесская область":
-                area_info = "Odessa region" 
+                area_info = "Odessa region"
             if data['money'] == 'До 350 $':
                 money_info = "Up to $ 350"
             elif data['money'] == '350 - 500 $':
@@ -758,7 +763,17 @@ async def translate_text(state:FSMContext, lang):
             elif data['money'] == '700 - 1000 $':
                 money_info = "700 - 1000 $"  
             elif data['money'] == 'Выше 1000 $':
-                money_info = "Higher than $ 1,000"                    
+                money_info = "Higher than $ 1,000"      
+            if data['money'] == '25.000 - 45.000 $':
+                money_info = "25.000 - 45.000 $"
+            elif data['money'] == '45.000 - 65.000 $':
+                money_info = "45.000 - 65.000 $"  
+            elif data['money'] == '65.000 - 90.000 $':
+                money_info = "65.000 - 90.000 $"  
+            elif data['money'] == '90.000 - 130.000 $':
+                money_info = "90.000 - 130.000 $"  
+            elif data['money'] == '130.000 - 250.000 $':
+                money_info = "130.000 - 250.000 $"                  
 
 
 @dp.callback_query_handler(state=Estate.finish, text_contains="finish")
