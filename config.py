@@ -38,3 +38,22 @@ LANG_UA = ["Агенство нерухомості Грифон є гарант
            "Відредагуйте вашу заявку",
            "Введіть коментар до замовлення (не обов'язково) 👇",
            ]
+
+LANG_ENG = ["Gryphon Real Estate Agency is a guarantee of quality and reliability for our clients. Constantly growing own base of objects includes more than 400 houses, and more than 1000 apartments of Odessa, a set of commercial premises and exclusive offers from developers of our city.",
+           "What interests you?",
+           "Here you can leave your number and the manager will contact you within a few minutes. 👇",
+           "Loading ...",
+           "You have ordered a call, we will contact you soon ✅",
+           "I am <b> your personal assistant Grifon </b>, We are an organization that provides services of fast and high-quality real estate selection!",
+           "How many rooms are you interested in?",
+           "How many rooms do you own?",
+           "What is your budget in USD 💲?",
+           "How much in USD💲 do you expect?",
+           "What area are you interested in?",
+           "In what area is your property?",
+           "Please provide your phone number, the manager will contact you shortly. 👇",
+           "You have canceled",
+           "Your application has been accepted and will be considered shortly ✅",
+           "Edit your application",
+           "Enter a comment for the order (not necessarily)👇",
+           ]           

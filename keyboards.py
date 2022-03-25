@@ -37,7 +37,8 @@ details_markup = InlineKeyboardMarkup().add(btnDetails)
 # Запрос языка
 btnRus = InlineKeyboardButton("🇷🇺 Русский язык", callback_data='lang_ru')
 btnUA = InlineKeyboardButton("​🇺🇦 Украинский язык", callback_data='lang_ua')
-lang_markup = InlineKeyboardMarkup(row_width=2).add(btnUA, btnRus)
+btnEng = InlineKeyboardButton("🇬🇧 English", callback_data='lang_eng')
+lang_markup = InlineKeyboardMarkup(row_width=2).add(btnUA, btnRus, btnEng)
 
 # Главное меню
 btnAbout = InlineKeyboardButton("❔ Узнать о нас", callback_data='menu_about')
@@ -114,10 +115,11 @@ btnSuvArea = InlineKeyboardButton("Суворовский", callback_data='area_
 btnPrimArea = InlineKeyboardButton("Приморский", callback_data='area_two')
 btnKievArea = InlineKeyboardButton("Киевский", callback_data='area_three')
 btnMalinArea = InlineKeyboardButton("Малиновский", callback_data='area_four')
+btnOdesRegion = InlineKeyboardButton("Одесская область", callback_data='area_five')
 btnAreaBack = InlineKeyboardButton("◀ Назад", callback_data="area_back")
 
 area_markup = InlineKeyboardMarkup(row_width=1).add(
-    btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea, btnAreaBack)
+    btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea, btnOdesRegion, btnAreaBack)
 
 
 # Клавиатура заказа звонка
