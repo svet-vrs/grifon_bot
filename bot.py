@@ -33,6 +33,9 @@ greeting = 'Я - <b>твой личный ассистент Grifon</b>, Мы о
 order_name = ""
 order_phone_num = ""
 bid_text = ""
+estates_info = ""
+area_info = ""
+money_info = ""
 
 # Взаимодействие с таблицей
 
@@ -661,50 +664,101 @@ async def check_call_request(message: types.Message, state=FSMContext):
 # результат заявки
 
 
+
+
+
 @dp.message_handler(content_types=['contact'], state=Estate.phone_num)
 async def fourth_question(message: types.Message, state=FSMContext):
+    global estates_info, area_info, money_info
     if message.chat.type == 'private':
+        phone = message.contact.phone_number
+        if phone.startswith("+"):
+            async with state.proxy() as data:
+                data['phone_num'] = phone
+        else:
+            phone_num = "+"+str(phone)
+            async with state.proxy() as data:
+                data['phone_num'] = phone_num
         async with state.proxy() as data:
             if data['lang'] == "RU":
                 bot_text = config.LANG_RU
                 kb = kbru
-                phone = message.contact.phone_number
-                if phone.startswith("+"):
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone
-                else:
-                    phone_num = "+"+str(phone)
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone_num
                 await Estate.next()
                 await bot.send_message(message.from_user.id, "Ваша заявка заполнена: \n\n🏠 Операция: "+str(data['estates'])+"\n🌐 Район: "+str(data['area'])+" \n🔢 Комнаты: "+str(data['rooms'])+"\n💵 Цена (дол.): "+str(data['money'])+"\n📞 Номер телефона: "+str(data['phone_num'])+"\n\nВсё верно?", reply_markup=kb.finish_markup)
             elif data['lang'] == "UA":
                 bot_text = config.LANG_UA
                 kb = kbua
-                phone = message.contact.phone_number
-                if phone.startswith("+"):
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone
-                else:
-                    phone_num = "+"+str(phone)
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone_num
+                lang = "UA_TEXT"
+                await translate_text(state, lang)
                 await Estate.next()
-                await bot.send_message(message.from_user.id, "Ваша заявка заповнена: \n\n🏠 Операція: "+str(data['estates'])+"\n🌐 Район: "+str(data['area'])+" \n🔢 Кімнати: "+str(data['rooms'])+"\n💵 Ціна (дол.): "+str(data['money'])+"\n📞 Номер телефону: "+str(data['phone_num'])+"\n\nВсе вірно?", reply_markup=kb.finish_markup)
+                await bot.send_message(message.from_user.id, "Ваша заявка заповнена: \n\n🏠 Операція: "+str(estates_info)+"\n🌐 Район: "+str(area_info)+" \n🔢 Кімнати: "+str(data['rooms'])+"\n💵 Ціна (дол.): "+str(data['money'])+"\n📞 Номер телефону: "+str(data['phone_num'])+"\n\nВсе вірно?", reply_markup=kb.finish_markup)
+                estates_info = ""
+                area_info = ""
             elif data['lang'] == "ENG":
                 bot_text = config.LANG_ENG
                 kb = kbeng
-                phone = message.contact.phone_number
-                if phone.startswith("+"):
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone
-                else:
-                    phone_num = "+"+str(phone)
-                    async with state.proxy() as data:
-                        data['phone_num'] = phone_num
+                lang = "ENG_TEXT"
+                await translate_text(state, lang)
                 await Estate.next()
-                await bot.send_message(message.from_user.id, "Your application has been completed: \n\n🏠 Operation: "+str(data['estates'])+"\n🌐 Area: "+str(data['area'])+" \n🔢 Rooms: "+str(data['rooms'])+"\n💵 Price (USD): "+str(data['money'])+"\n📞 Phone number: "+str(data['phone_num'])+"\n\nEverything is correct?", reply_markup=kb.finish_markup)
+                await bot.send_message(message.from_user.id, "Your application has been completed: \n\n🏠 Operation: "+str(estates_info)+"\n🌐 Area: "+str(area_info)+" \n🔢 Rooms: "+str(data['rooms'])+"\n💵 Price (USD): "+str(money_info)+"\n📞 Phone number: "+str(data['phone_num'])+"\n\nEverything is correct?", reply_markup=kb.finish_markup)
+                estates_info = ""
+                area_info= ""
+                money_info= ""
 
+
+async def translate_text(state:FSMContext, lang):
+    global estates_info, area_info, money_info
+    if lang == "UA_TEXT":
+        async with state.proxy() as data:
+            if data['estates'] == "Приобрести недвижимость":
+                estates_info = "Купити нерухомість"
+            elif data['estates'] == "Продать недвижимость":
+                estates_info = "Продати нерухомість"
+            elif data['estates'] == "Снять жилье":
+                estates_info = "Зняти житло"
+            elif data['estates'] == "Сдать в аренду жилье":
+                estates_info = "Здати в оренду житло"
+            if data['area'] == "Cуворовский":
+                area_info = "Суворовський"
+            elif data['area'] == "Приморский":
+                area_info = "Приморський"
+            elif data['area'] == "Киевский":
+                area_info = "Київський"
+            elif data['area'] == "Малиновский":
+                area_info = "Малиновський"
+            elif data['area'] == "Одесская область":
+                area_info = "Одеська область"
+            
+    elif lang == "ENG_TEXT":
+        async with state.proxy() as data:
+            if data['estates'] == "Приобрести недвижимость":
+                estates_info = "Buy estate"
+            elif data['estates'] == "Продать недвижимость":
+                estates_info = "Sell estate"
+            elif data['estates'] == "Снять жилье":
+                estates_info = "Rent estate"
+            elif data['estates'] == "Сдать в аренду жилье":
+                estates_info = "Rent out estate"
+            if data['area'] == "Cуворовский":
+                area_info = "Suvorov area"
+            elif data['area'] == "Приморский":
+                area_info = "Primorskiy area"
+            elif data['area'] == "Киевский":
+                area_info = "Kyiv area"
+            elif data['area'] == "Малиновский":
+                area_info = "Malinowski area"
+            elif data['area'] == "Одесская область":
+                area_info = "Odessa region" 
+            if data['money'] == 'До 350 $':
+                money_info = "Up to $ 350"
+            elif data['money'] == '350 - 500 $':
+                money_info = "350 - 500 $"  
+            elif data['money'] == '500 - 700 $':
+                money_info = "500 - 700 $"  
+            elif data['money'] == '700 - 1000 $':
+                money_info = "700 - 1000 $"  
+            elif data['money'] == 'Выше 1000 $':
+                money_info = "Higher than $ 1,000"                    
 
 
 @dp.callback_query_handler(state=Estate.finish, text_contains="finish")

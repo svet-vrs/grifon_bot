@@ -42,7 +42,7 @@ btnRoomThree = InlineKeyboardButton("3", callback_data='room_3')
 btnRoomFour = InlineKeyboardButton("4+", callback_data='room_4more')
 btnRoomBack = InlineKeyboardButton("◀ Назад", callback_data='room_back')
 
-rooms_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+rooms_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
     btnRoomOne, btnRoomTwo, btnRoomThree, btnRoomFour, btnRoomBack)
 
 # Клавиатура аренды

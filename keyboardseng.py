@@ -42,7 +42,7 @@ btnRoomThree = InlineKeyboardButton("3", callback_data='room_3')
 btnRoomFour = InlineKeyboardButton("4+", callback_data='room_4more')
 btnRoomBack = InlineKeyboardButton("◀ Back", callback_data='room_back')
 
-rooms_markup = InlineKeyboardMarkup(resize_keyboard=True).add(
+rooms_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
     btnRoomOne, btnRoomTwo, btnRoomThree, btnRoomFour, btnRoomBack)
 
 # Клавиатура аренды
@@ -53,7 +53,7 @@ btnRentThree = InlineKeyboardButton(
 btnRentFour = InlineKeyboardButton(
     "700 - 1000 $", callback_data="pricerent_four")
 btnRentFive = InlineKeyboardButton(
-    "Higher for $ 1,000", callback_data="pricerent_five")
+    "Higher than $ 1,000", callback_data="pricerent_five")
 btnRentBack = InlineKeyboardButton("◀ Back", callback_data="pricerent_back")
 rent_markup = InlineKeyboardMarkup(
     resize_keyboard=True, row_width=1).add(btnRentOne, btnRentTwo, btnRentThree, btnRentFour, btnRentFive, btnRentBack)
