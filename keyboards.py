@@ -148,3 +148,4 @@ clear_markup = types.ReplyKeyboardRemove()
 # комментарий
 btnSkip = InlineKeyboardButton("⏭ Пропустить", callback_data='following_btn')
 comment_markup = InlineKeyboardMarkup(row_width=1).add(btnSkip)
+

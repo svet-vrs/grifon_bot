@@ -16,6 +16,7 @@ import keyboards as kbru
 import keyboardsua as kbua
 import keyboardseng as kbeng
 from data_base import sqlite_db
+from aiogram.utils.exceptions import MessageNotModified
 bot = Bot(config.TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
@@ -80,8 +81,8 @@ def check_sub_channel(chat_member):
         return False
 
 
-@dp.message_handler(commands=['admin'])
-async def make_changes_command(message: types.Message):
+@dp.message_handler(commands=['admin'], state="*")
+async def make_changes_command(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
         if check_sub_channel(await bot.get_chat_member(chat_id=config.CHAT_ID, user_id=message.from_user.id)):
             global ID
@@ -89,10 +90,11 @@ async def make_changes_command(message: types.Message):
             admin_name = message.from_user.first_name
             await bot.send_message(message.from_user.id, text="Уважаемый <b>"+str(admin_name)+"</b>, вы перешли в панель администратора", parse_mode='HTML', reply_markup=kbru.admin_main_markup)
         else:
+            await state.reset_state(with_data=False)
             await bot.send_message(message.from_user.id, 'Вам недоступна панель модератора', reply_markup=kbru.menu_markup)
 
 
-@dp.callback_query_handler(text_contains="admin")
+@dp.callback_query_handler(text_contains="admin", state="*")
 async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
     if call.data == "admin_delete":
         await Admin.delete_id.set()
@@ -100,9 +102,10 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                     text='Введите ID заявки, которую нужно удалить:', reply_markup=kbru.admin_sub_markup)
     elif call.data == 'admin_exit':
-        await state.reset_state(with_data=False)
+        await state.finish()
+        await Estate.lang.set()
         await bot.answer_callback_query(call.id, text="Вы вышли с панели модератора", show_alert=True)
-        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=greeting, parse_mode='html', reply_markup=kbru.menu_markup)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Выберите язык Бота 👇", reply_markup=kbru.lang_markup)
 
 # Отмена удаления заявки
 
@@ -377,8 +380,7 @@ async def check_call_request(call: types.CallbackQuery, state=FSMContext):
             bot_text = config.LANG_ENG
             kb = kbeng
     await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[5], parse_mode='html', reply_markup=kb.menu_markup)
-
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[5], parse_mode=types.ParseMode.HTML, reply_markup=kb.menu_markup)
 
 # Главное меню - Подобрать жилье: реакция на кнопки
 
@@ -857,6 +859,12 @@ async def final_question(call: types.CallbackQuery, state=FSMContext):
 
 
 # ***********************************Запуск бота***********************************
+
+
+@dp.errors_handler(exception=MessageNotModified)  # for skipping this exception
+async def message_not_modified_handler(update, error):
+    return True
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
