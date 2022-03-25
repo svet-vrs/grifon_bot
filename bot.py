@@ -246,6 +246,43 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
         await bot.delete_message(call.from_user.id, call.message.message_id)
         await bot.send_message(call.from_user.id, text=bot_text[2], reply_markup=kb.contact_markup)
 
+# Главное меню - Заказать звонок: реакция на кнопку назад
+
+
+@dp.message_handler(state=Admin.order_phone_num)
+async def check_call_request(message: types.Message, state=FSMContext):
+    if message.chat.type == 'private':
+        async with state.proxy() as data:
+            if data['lang'] == "RU":
+                bot_text = config.LANG_RU
+                kb = kbru
+            elif data['lang'] == "UA":
+                bot_text = config.LANG_UA
+                kb = kbua
+            elif data['lang'] == "ENG":
+                bot_text = config.LANG_ENG
+                kb = kbeng
+        if message.text == "❌ Отмена" or message.text == "❌ Cкасування" or message.text == "❌ Cancel":
+            await state.reset_state(with_data=False)
+            await bot.send_message(message.from_user.id, bot_text[5], parse_mode='html', reply_markup=kb.menu_markup)
+        else:
+            async with state.proxy() as data:
+                data['id'] = random.randint(1000, 9999)
+            async with state.proxy() as data:
+                data['name'] = message.from_user.first_name
+            phone = message.text
+            if phone.startswith("+"):
+                async with state.proxy() as data:
+                    data['phone_num'] = phone
+            else:
+                phone_num = "+"+str(phone)
+                async with state.proxy() as data:
+                    data['phone_num'] = phone_num
+            async with state.proxy() as data:
+                data['manager'] = ""
+            await Admin.next()
+            await bot.send_message(message.from_user.id, bot_text[16], reply_markup=kb.comment_markup)
+
 # Главное меню - Заказать звонок: реакция на отправленный контакт
 
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
@@ -323,26 +360,6 @@ async def connect_button(call: types.CallbackQuery, state=FSMContext):
     await sqlite_db.sql_add_call_command(state)
     await state.reset_state(with_data=False)
 
-
-# Главное меню - Заказать звонок: реакция на кнопку назад
-
-
-@dp.message_handler(state=Admin.order_phone_num)
-async def check_call_request(message: types.Message, state=FSMContext):
-    if message.chat.type == 'private':
-        async with state.proxy() as data:
-            if data['lang'] == "RU":
-                bot_text = config.LANG_RU
-                kb = kbru
-            elif data['lang'] == "UA":
-                bot_text = config.LANG_UA
-                kb = kbua
-            elif data['lang'] == "ENG":
-                bot_text = config.LANG_ENG
-                kb = kbeng
-        if message.text == "❌ Отмена" or message.text == "❌ Cкасування" or message.text == "❌ Cancel":
-            await state.reset_state(with_data=False)
-            await bot.send_message(message.from_user.id, bot_text[5], parse_mode='html', reply_markup=kb.menu_markup)
 
 # Главное меню - О нас: реакция на кнопку назад
 
@@ -650,6 +667,7 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
 
 @dp.message_handler(state=Estate.phone_num)
 async def check_call_request(message: types.Message, state=FSMContext):
+    global estates_info, area_info, money_info
     if message.chat.type == 'private':
         async with state.proxy() as data:
             if data['lang'] == "RU":
@@ -664,11 +682,40 @@ async def check_call_request(message: types.Message, state=FSMContext):
         if message.text == "❌ Отмена" or message.text == "❌ Cкасування" or message.text == "❌ Cancel":
             await state.reset_state(with_data=False)
             await message.reply(bot_text[13], reply_markup=kb.menu_markup)
-
-# результат заявки
-
-
-
+        else:
+            phone = message.text
+            if phone.startswith("+"):
+                async with state.proxy() as data:
+                    data['phone_num'] = phone
+            else:
+                phone_num = "+"+str(phone)
+                async with state.proxy() as data:
+                    data['phone_num'] = phone_num
+            async with state.proxy() as data:
+                if data['lang'] == "RU":
+                    bot_text = config.LANG_RU
+                    kb = kbru
+                    await Estate.next()
+                    await bot.send_message(message.from_user.id, "Ваша заявка заполнена: \n\n🏠 Операция: "+str(data['estates'])+"\n🌐 Район: "+str(data['area'])+" \n🔢 Комнаты: "+str(data['rooms'])+"\n💵 Цена (дол.): "+str(data['money'])+"\n📞 Номер телефона: "+str(data['phone_num'])+"\n\nВсё верно?", reply_markup=kb.finish_markup)
+                elif data['lang'] == "UA":
+                    bot_text = config.LANG_UA
+                    kb = kbua
+                    lang = "UA_TEXT"
+                    await translate_text(state, lang)
+                    await Estate.next()
+                    await bot.send_message(message.from_user.id, "Ваша заявка заповнена: \n\n🏠 Операція: "+str(estates_info)+"\n🌐 Район: "+str(area_info)+" \n🔢 Кімнати: "+str(data['rooms'])+"\n💵 Ціна (дол.): "+str(data['money'])+"\n📞 Номер телефону: "+str(data['phone_num'])+"\n\nВсе вірно?", reply_markup=kb.finish_markup)
+                    estates_info = ""
+                    area_info = ""
+                elif data['lang'] == "ENG":
+                    bot_text = config.LANG_ENG
+                    kb = kbeng
+                    lang = "ENG_TEXT"
+                    await translate_text(state, lang)
+                    await Estate.next()
+                    await bot.send_message(message.from_user.id, "Your application has been completed: \n\n🏠 Operation: "+str(estates_info)+"\n🌐 Area: "+str(area_info)+" \n🔢 Rooms: "+str(data['rooms'])+"\n💵 Price (USD): "+str(money_info)+"\n📞 Phone number: "+str(data['phone_num'])+"\n\nEverything is correct?", reply_markup=kb.finish_markup)
+                    estates_info = ""
+                    area_info= ""
+                    money_info= ""
 
 
 @dp.message_handler(content_types=['contact'], state=Estate.phone_num)
@@ -743,7 +790,6 @@ async def translate_text(state:FSMContext, lang):
                 estates_info = "Rent estate"
             elif data['estates'] == "Сдать в аренду жилье":
                 estates_info = "Rent out estate"
-
             if data['area'] == "Cуворовский":
                 area_info = "Suvorov area"
             elif data['area'] == "Приморский":

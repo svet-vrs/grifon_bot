@@ -37,7 +37,7 @@ details_markup = InlineKeyboardMarkup().add(btnDetails)
 # Запрос языка
 btnRus = InlineKeyboardButton("🇷🇺 Русский язык", callback_data='lang_ru')
 btnUA = InlineKeyboardButton("​🇺🇦 Украинский язык", callback_data='lang_ua')
-btnEng = InlineKeyboardButton("🇬🇧 English", callback_data='lang_eng')
+btnEng = InlineKeyboardButton("🇬🇧 English language", callback_data='lang_eng')
 lang_markup = InlineKeyboardMarkup(row_width=2).add(btnUA, btnRus, btnEng)
 
 # Главное меню
