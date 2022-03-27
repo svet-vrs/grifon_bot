@@ -109,13 +109,7 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
 
 # Отмена удаления заявки
 
-
-@dp.callback_query_handler(text="adminsub_cancel", state="*")
-async def cancel_handler(call: types.CallbackQuery, state: FSMContext):
-    await state.finish()
-    await bot.answer_callback_query(call.id)
-    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                text='Панель администратора', reply_markup=kbru.admin_main_markup)
+   
 
 
 # Принятие заявки в группе
@@ -134,7 +128,7 @@ async def connect_button(call: types.CallbackQuery):
     sqlite_db.call_comment = ""
     sqlite_db.call_lang = ""
 
-
+# Отказ от заявки
 @dp.callback_query_handler(text_contains="bidmenu")
 async def bid_menu_button(call: types.CallbackQuery):
     if call.data == "bidmenu_reject":
@@ -186,21 +180,25 @@ async def delete_request(message: types.Message, state: FSMContext):
             else:
                 return
 
+@dp.callback_query_handler(state=Admin.delete_id, text="sub_cancel")
+async def cancel_delete(call: types.CallbackQuery, state=FSMContext):
+    await state.finish()
+    await bot.answer_callback_query(call.id)
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Панель администратора', reply_markup=kbru.admin_main_markup)
 # ////Клиентская часть////
 
 # Приветствие и появление главного меню
 
 
-@dp.message_handler(commands=['start'], state=None)
-async def language(message: types.Message):
+@dp.message_handler(commands=['start'], state="*")
+async def language(message: types.Message, state=FSMContext):
     if message.chat.type == 'private':
+        await state.finish()
         await Estate.lang.set()
         await bot.send_sticker(message.from_user.id, r'CAACAgIAAxkBAAEEKuxiMHggQNoJKse-Kg4aQkbmTCXEmgACthUAAkwaiUmFljrdCwZhOCME')
         await bot.send_message(message.from_user.id, "Выберите язык Бота 👇", reply_markup=kbru.lang_markup)
-
+        
 # Проверка выбранного языка
-
-
 @dp.callback_query_handler(text_contains="lang", state=Estate.lang)
 async def welcome(call: types.CallbackQuery, state=FSMContext):
     if call.data == "lang_ru":
@@ -221,7 +219,6 @@ async def welcome(call: types.CallbackQuery, state=FSMContext):
             data['lang'] = "ENG"
         await state.reset_state(with_data=False)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Welcome, " + call.from_user.first_name + " 👋\nI am <b>your personal assistant Grifon</b>, We are an organization that provides services for fast and high-quality selection of real estate!", parse_mode='html', reply_markup=kbeng.menu_markup)
-
 
 # Главное меню: реакция на кнопки
 @dp.callback_query_handler(text_contains="menu")
@@ -246,7 +243,7 @@ async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
     if call.data == 'menu_managers':
         await bot.answer_callback_query(call.id)
         await Admin.order_phone_num.set()
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.from_user.id, text=bot_text[2], reply_markup=kb.contact_markup)
 
 # Главное меню - Заказать звонок: реакция на кнопку назад
@@ -621,35 +618,35 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
             data['area'] = "Cуворовский"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.message.chat.id,  bot_text[12], reply_markup=kb.contact_markup)
     elif call.data == 'area_two':
         async with state.proxy() as data:
             data['area'] = "Приморский"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup)
     elif call.data == 'area_three':
         async with state.proxy() as data:
             data['area'] = "Киевский"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup)
     if call.data == 'area_four':
         async with state.proxy() as data:
             data['area'] = "Малиновский"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup)
     if call.data == 'area_five':
         async with state.proxy() as data:
             data['area'] = "Одесская область"
         await Estate.next()
         await bot.answer_callback_query(call.id)
-        await bot.delete_message(call.from_user.id, call.message.message_id)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
         await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup) 
     if call.data == 'area_back':
         await state.reset_state(with_data=False)

@@ -14,8 +14,7 @@ admin_main_markup = InlineKeyboardMarkup(
     row_width=2).add(btnBids, btnDelete, btnAdminExit)
 
 # Клавиатура удаления в админке
-btnAdminCancel = InlineKeyboardButton(
-    "❌ Отмена", callback_data='adminsub_cancel')
+btnAdminCancel = InlineKeyboardButton("❌ Отмена", callback_data='sub_cancel')
 admin_sub_markup = InlineKeyboardMarkup(
     resize_keyboard=True, one_time_keyboard=True).add(btnAdminCancel)
 
