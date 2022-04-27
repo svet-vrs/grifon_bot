@@ -60,30 +60,34 @@ rent_markup = InlineKeyboardMarkup(
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton(
-    "25.000 - 45.000 $", callback_data='pricebuy_one')
+    "Up to 25.000 $", callback_data='pricebuy_one')
 btnBuyTwo = InlineKeyboardButton(
-    "45.000 - 65.000 $", callback_data='pricebuy_two')
+    "25.000 - 45.000 $ ", callback_data='pricebuy_two')
 btnBuyThree = InlineKeyboardButton(
-    "65.000 - 90.000 $", callback_data='pricebuy_three')
+    "45.000 - 65.000 $", callback_data='pricebuy_three')
 btnBuyFour = InlineKeyboardButton(
-    "90.000 - 130.000 $", callback_data='pricebuy_four')
+    "65.000 - 90.000 $", callback_data='pricebuy_four')
 btnBuyFive = InlineKeyboardButton(
-    "130.000 - 250.000 $", callback_data='pricebuy_five')
+    "90.000 - 130.000 $", callback_data='pricebuy_five')
+btnBuySix = InlineKeyboardButton(
+    "Higher than 130.000 $", callback_data='pricebuy_six')
 btnBuyBack = InlineKeyboardButton("◀ Back", callback_data="pricebuy_back")
 buy_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
-    btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
+    btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuySix, btnBuyBack)
 
 # Выбор районов
 
 btnSuvArea = InlineKeyboardButton("Suvorov area", callback_data='area_one')
 btnPrimArea = InlineKeyboardButton("Primorskiy area", callback_data='area_two')
 btnKievArea = InlineKeyboardButton("Kyiv area", callback_data='area_three')
-btnMalinArea = InlineKeyboardButton("Malinowski area", callback_data='area_four')
-btnOdesRegion = InlineKeyboardButton("Odessa region", callback_data='area_five')
+btnMalinArea = InlineKeyboardButton(
+    "Malinowski area", callback_data='area_four')
+btnOdesRegion = InlineKeyboardButton(
+    "Odessa region", callback_data='area_five')
 btnAreaBack = InlineKeyboardButton("◀ Back", callback_data="area_back")
 
 area_markup = InlineKeyboardMarkup(row_width=1).add(
-    btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea,btnOdesRegion, btnAreaBack)
+    btnSuvArea, btnPrimArea, btnKievArea, btnMalinArea, btnOdesRegion, btnAreaBack)
 
 
 # Клавиатура заказа звонка

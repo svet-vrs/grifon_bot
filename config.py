@@ -1,8 +1,4 @@
 # токен botfather
-TOKEN = '5147511306:AAGct4vGbYWOla9YTOY3ayGlIEAiT3dnRcQ'
-TABLE_ID = '1vkBpMw2fpXL5yUM1jQL8IBihddWtDmwCTF1covW7dm8'
-CHAT_ID = '-787566705'
-
 
 LANG_RU = ["Агенство недвижимости Грифон является гарантией качества и надежности для наших клиентов ✅. Постоянная растущая собственная база объектов включает в себя более 400 домов, и более 1000 квартир Одессы 🏘, множество коммерческих помещений 🏢 и эксклюзивных предложений от застройщиков нашего города 🏗.",
            "Что вас интересует?",
@@ -45,20 +41,20 @@ LANG_UA = ["Агенство нерухомості Грифон є гарант
 
 
 LANG_ENG = ["Gryphon Real Estate Agency is a guarantee of quality and safety for our clients ✅. Constantly growing own base of objects includes more than 400 houses, and more than 1000 apartments of Odessa 🏘, a set of commercial premises 🏢 and exclusive offers from developers of our city 🏗.",
-           "What are you interested in?",
-           "Here you can leave your number and the manager will contact you within a few minutes. You can also enter your number manually, just send it by message. 👇",
-           "Loading ...",
-           "You have ordered a call, we will contact you soon ✅",
-           "I am <b> your personal assistant Grifon </b>, We are an organization that provides services of fast and high-quality real estate selection!",
-           "How many rooms are you interested in?",
-           "How many rooms do you own?",
-           "What is your budget in USD 💲?",
-           "How much in USD💲 do you expect?",
-           "What area are you interested in?",
-           "In what area is your property?",
-           "Please provide your phone number, the manager will contact you shortly. You can also enter your number manually, just send it by message. 👇",
+            "What are you interested in?",
+            "Here you can leave your number and the manager will contact you within a few minutes. You can also enter your number manually, just send it by message. 👇",
+            "Loading ...",
+            "You have ordered a call, we will contact you soon ✅",
+            "I am <b> your personal assistant Grifon </b>, We are an organization that provides services of fast and high-quality real estate selection!",
+            "How many rooms are you interested in?",
+            "How many rooms do you own?",
+            "What is your budget in USD 💲?",
+            "How much in USD💲 do you expect?",
+            "What area are you interested in?",
+            "In what area is your property?",
+            "Please provide your phone number, the manager will contact you shortly. You can also enter your number manually, just send it by message. 👇",
             "You have canceled ❌",
-           "Your application has been accepted and will be considered shortly ✅",
-           "Edit your application",
+            "Your application has been accepted and will be considered shortly ✅",
+            "Edit your application",
             "Please, indicate what time is convenient for you to talk and, as needed, leave your comment (optionally) 👇",
-           ]           
+            ]

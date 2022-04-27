@@ -109,8 +109,6 @@ async def admin_buttons(call: types.CallbackQuery, state=FSMContext):
 
 # Отмена удаления заявки
 
-   
-
 
 # Принятие заявки в группе
 
@@ -129,6 +127,8 @@ async def connect_button(call: types.CallbackQuery):
     sqlite_db.call_lang = ""
 
 # Отказ от заявки
+
+
 @dp.callback_query_handler(text_contains="bidmenu")
 async def bid_menu_button(call: types.CallbackQuery):
     if call.data == "bidmenu_reject":
@@ -180,6 +180,7 @@ async def delete_request(message: types.Message, state: FSMContext):
             else:
                 return
 
+
 @dp.callback_query_handler(state=Admin.delete_id, text="sub_cancel")
 async def cancel_delete(call: types.CallbackQuery, state=FSMContext):
     await state.finish()
@@ -197,8 +198,10 @@ async def language(message: types.Message, state=FSMContext):
         await Estate.lang.set()
         await bot.send_sticker(message.from_user.id, r'CAACAgIAAxkBAAEEKuxiMHggQNoJKse-Kg4aQkbmTCXEmgACthUAAkwaiUmFljrdCwZhOCME')
         await bot.send_message(message.from_user.id, "Выберите язык Бота 👇", reply_markup=kbru.lang_markup)
-        
+
 # Проверка выбранного языка
+
+
 @dp.callback_query_handler(text_contains="lang", state=Estate.lang)
 async def welcome(call: types.CallbackQuery, state=FSMContext):
     if call.data == "lang_ru":
@@ -221,6 +224,8 @@ async def welcome(call: types.CallbackQuery, state=FSMContext):
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Welcome, " + call.from_user.first_name + " 👋\nI am <b>your personal assistant Grifon</b>, We are an organization that provides services for fast and high-quality selection of real estate!", parse_mode='html', reply_markup=kbeng.menu_markup)
 
 # Главное меню: реакция на кнопки
+
+
 @dp.callback_query_handler(text_contains="menu")
 async def menu_buttons(call: types.CallbackQuery, state=FSMContext):
     async with state.proxy() as data:
@@ -284,6 +289,7 @@ async def check_call_request(message: types.Message, state=FSMContext):
             await bot.send_message(message.from_user.id, bot_text[16], reply_markup=kb.comment_markup)
 
 # Главное меню - Заказать звонок: реакция на отправленный контакт
+
 
 @dp.message_handler(content_types=['contact'], state=Admin.order_phone_num)
 async def create_call_order(message: types.Message, state=FSMContext):
@@ -380,6 +386,7 @@ async def check_call_request(call: types.CallbackQuery, state=FSMContext):
     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[5], parse_mode=types.ParseMode.HTML, reply_markup=kb.menu_markup)
 
 # Главное меню - Подобрать жилье: реакция на кнопки
+
 
 @dp.callback_query_handler(state=Estate.estates, text_contains="estate")
 async def estate_buttons(call: types.CallbackQuery, state=FSMContext):
@@ -513,33 +520,40 @@ async def second_question_buy(call: types.CallbackQuery, state=FSMContext):
         elif data['lang'] == "ENG":
             bot_text = config.LANG_ENG
             kb = kbeng
+
     if call.data == 'pricebuy_one':
+        async with state.proxy() as data:
+            data['money'] = 'До 25.000 $'
+        await Estate.next()
+        await bot.answer_callback_query(call.id)
+        await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
+    if call.data == 'pricebuy_two':
         async with state.proxy() as data:
             data['money'] = '25.000 - 45.000 $'
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
-    elif call.data == 'pricebuy_two':
+    elif call.data == 'pricebuy_three':
         async with state.proxy() as data:
             data['money'] = '45.000 - 65.000 $'
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
-    elif call.data == 'pricebuy_three':
+    elif call.data == 'pricebuy_four':
         async with state.proxy() as data:
             data['money'] = '65.000 - 90.000 $'
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
-    elif call.data == 'pricebuy_four':
+    elif call.data == 'pricebuy_five':
         async with state.proxy() as data:
             data['money'] = '90.000 - 130.000 $'
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
-    elif call.data == 'pricebuy_five':
+    elif call.data == 'pricebuy_six':
         async with state.proxy() as data:
-            data['money'] = '130.000 - 250.000 $'
+            data['money'] = 'От 130.000 $'
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[10], reply_markup=kb.area_markup)
@@ -647,7 +661,7 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
         await Estate.next()
         await bot.answer_callback_query(call.id)
         await bot.delete_message(call.message.chat.id, call.message.message_id)
-        await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup) 
+        await bot.send_message(call.message.chat.id, bot_text[12], reply_markup=kb.contact_markup)
     if call.data == 'area_back':
         await state.reset_state(with_data=False)
         await Estate.money.set()
@@ -657,8 +671,6 @@ async def third_question(call: types.CallbackQuery, state=FSMContext):
         elif data['estates'] == "Снять жилье" or data['estates'] == "Сдать в аренду жилье":
             await bot.answer_callback_query(call.id)
             await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=bot_text[9], reply_markup=kb.rent_markup)
-        
-        
 
 
 # Запрос контакта
@@ -713,8 +725,8 @@ async def check_call_request(message: types.Message, state=FSMContext):
                     await Estate.next()
                     await bot.send_message(message.from_user.id, "Your application has been completed: \n\n🏠 Operation: "+str(estates_info)+"\n🌐 Area: "+str(area_info)+" \n🔢 Rooms: "+str(data['rooms'])+"\n💵 Price (USD): "+str(money_info)+"\n📞 Phone number: "+str(data['phone_num'])+"\n\nEverything is correct?", reply_markup=kb.finish_markup)
                     estates_info = ""
-                    area_info= ""
-                    money_info= ""
+                    area_info = ""
+                    money_info = ""
 
 
 @dp.message_handler(content_types=['contact'], state=Estate.phone_num)
@@ -752,11 +764,11 @@ async def fourth_question(message: types.Message, state=FSMContext):
                 await Estate.next()
                 await bot.send_message(message.from_user.id, "Your application has been completed: \n\n🏠 Operation: "+str(estates_info)+"\n🌐 Area: "+str(area_info)+" \n🔢 Rooms: "+str(data['rooms'])+"\n💵 Price (USD): "+str(money_info)+"\n📞 Phone number: "+str(data['phone_num'])+"\n\nEverything is correct?", reply_markup=kb.finish_markup)
                 estates_info = ""
-                area_info= ""
-                money_info= ""
+                area_info = ""
+                money_info = ""
 
 
-async def translate_text(state:FSMContext, lang):
+async def translate_text(state: FSMContext, lang):
     global estates_info, area_info, money_info
     if lang == "UA_TEXT":
         async with state.proxy() as data:
@@ -778,7 +790,7 @@ async def translate_text(state:FSMContext, lang):
                 area_info = "Малиновський"
             elif data['area'] == "Одесская область":
                 area_info = "Одеська область"
-            
+
     elif lang == "ENG_TEXT":
         async with state.proxy() as data:
             if data['estates'] == "Приобрести недвижимость":
@@ -802,23 +814,27 @@ async def translate_text(state:FSMContext, lang):
             if data['money'] == 'До 350 $':
                 money_info = "Up to $ 350"
             elif data['money'] == '350 - 500 $':
-                money_info = "350 - 500 $"  
+                money_info = "350 - 500 $"
             elif data['money'] == '500 - 700 $':
-                money_info = "500 - 700 $"  
+                money_info = "500 - 700 $"
             elif data['money'] == '700 - 1000 $':
-                money_info = "700 - 1000 $"  
+                money_info = "700 - 1000 $"
             elif data['money'] == 'Выше 1000 $':
-                money_info = "Higher than $ 1,000"      
-            if data['money'] == '25.000 - 45.000 $':
+                money_info = "Higher than $ 1,000"
+            if data['money'] == 'До 25.000 $':
+                money_info = "Up to 25.000 $"
+            elif data['money'] == '25.000 - 45.000 $':
                 money_info = "25.000 - 45.000 $"
-            elif data['money'] == '45.000 - 65.000 $':
-                money_info = "45.000 - 65.000 $"  
+            if data['money'] == '45.000 - 65.000 $':
+                money_info = "45.000 - 65.000 $"
             elif data['money'] == '65.000 - 90.000 $':
-                money_info = "65.000 - 90.000 $"  
-            elif data['money'] == '90.000 - 130.000 $':
-                money_info = "90.000 - 130.000 $"  
+                money_info = "65.000 - 90.000 $"
+            if data['money'] == '90.000 - 130.000 $':
+                money_info = "90.000 - 130.000 $"
             elif data['money'] == '130.000 - 250.000 $':
-                money_info = "130.000 - 250.000 $"                  
+                money_info = "130.000 - 250.000 $"
+            if data['money'] == 'От 130.000 $':
+                money_info = "Higher than 130.000 $"
 
 
 @dp.callback_query_handler(state=Estate.finish, text_contains="finish")

@@ -95,18 +95,20 @@ rent_markup = InlineKeyboardMarkup(
 
 # Клавиатура продажи
 btnBuyOne = InlineKeyboardButton(
-    "25.000 - 45.000 $", callback_data='pricebuy_one')
+    "До 25.000 $", callback_data='pricebuy_one')
 btnBuyTwo = InlineKeyboardButton(
-    "45.000 - 65.000 $", callback_data='pricebuy_two')
+    "25.000 - 45.000 $ ", callback_data='pricebuy_two')
 btnBuyThree = InlineKeyboardButton(
-    "65.000 - 90.000 $", callback_data='pricebuy_three')
+    "45.000 - 65.000 $", callback_data='pricebuy_three')
 btnBuyFour = InlineKeyboardButton(
-    "90.000 - 130.000 $", callback_data='pricebuy_four')
+    "65.000 - 90.000 $", callback_data='pricebuy_four')
 btnBuyFive = InlineKeyboardButton(
-    "130.000 - 250.000 $", callback_data='pricebuy_five')
+    "90.000 - 130.000 $", callback_data='pricebuy_five')
+btnBuySix = InlineKeyboardButton(
+    "От 130.000 $", callback_data='pricebuy_six')
 btnBuyBack = InlineKeyboardButton("◀ Назад", callback_data="pricebuy_back")
 buy_markup = InlineKeyboardMarkup(resize_keyboard=True, row_width=1).add(
-    btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuyBack)
+    btnBuyOne, btnBuyTwo, btnBuyThree, btnBuyFour, btnBuyFive, btnBuySix, btnBuyBack)
 
 # Выбор районов
 
@@ -114,7 +116,8 @@ btnSuvArea = InlineKeyboardButton("Суворовский", callback_data='area_
 btnPrimArea = InlineKeyboardButton("Приморский", callback_data='area_two')
 btnKievArea = InlineKeyboardButton("Киевский", callback_data='area_three')
 btnMalinArea = InlineKeyboardButton("Малиновский", callback_data='area_four')
-btnOdesRegion = InlineKeyboardButton("Одесская область", callback_data='area_five')
+btnOdesRegion = InlineKeyboardButton(
+    "Одесская область", callback_data='area_five')
 btnAreaBack = InlineKeyboardButton("◀ Назад", callback_data="area_back")
 
 area_markup = InlineKeyboardMarkup(row_width=1).add(
@@ -147,4 +150,3 @@ clear_markup = types.ReplyKeyboardRemove()
 # комментарий
 btnSkip = InlineKeyboardButton("⏭ Пропустить", callback_data='following_btn')
 comment_markup = InlineKeyboardMarkup(row_width=1).add(btnSkip)
-
