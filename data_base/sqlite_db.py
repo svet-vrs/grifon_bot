@@ -1,9 +1,9 @@
-from email import message
 import sqlite3 as sq
+
 from aiogram import types
+
 import keyboards as kb
-import bot
-import config
+
 parse = []
 del_check = False
 update_check = False
@@ -12,14 +12,14 @@ call_phone = ""
 call_message = ""
 call_comment = ""
 call_lang = ""
+base = sq.connect('users_req.db')
+base2 = sq.connect('users_calls.db')
+cur = base.cursor()
+cur2 = base2.cursor()
 
 
 def sql_start():
     global base, base2, cur, cur2
-    base = sq.connect('users_req.db')
-    base2 = sq.connect('users_calls.db')
-    cur = base.cursor()
-    cur2 = base2.cursor()
     if base:
         print('База1 подключена')
     if base2:
@@ -31,14 +31,17 @@ def sql_start():
         'CREATE TABLE IF NOT EXISTS calls(id INTEGER, name TEXT, contacts TEXT, message TEXT, manager TEXT, lang TEXT, comment TEXT)')
     base2.commit()
 
+
 # Добавление заявок на покупку
 
 
 async def sql_add_command(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?,?)',
-                    (data['user_id'], data['name'], data['phone_num'], data['estates'], data['rooms'], data['money'], data['area'], data['lang']))
+                    (data['user_id'], data['name'], data['phone_num'], data['estates'], data['rooms'], data['money'],
+                     data['area'], data['lang']))
         base.commit()
+
 
 # Добавление заказов на звонок
 
@@ -46,7 +49,8 @@ async def sql_add_command(state):
 async def sql_add_call_command(state):
     async with state.proxy() as data:
         cur2.execute('INSERT INTO calls VALUES (?,?,?,?,?,?,?)',
-                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager'], data['lang'], data['order_comment']))
+                     (data['id'], data['name'], data['phone_num'], data['message_id'], data['manager'], data['lang'],
+                      data['order_comment']))
         base2.commit()
 
 
@@ -79,7 +83,7 @@ async def sql_view2_call_command(manager_id):
         phone = cur2.execute("SELECT contacts FROM calls WHERE manager == ?", [
             manager_id]).fetchone()
         message = cur2.execute("SELECT message FROM calls WHERE manager == ?", [
-                               manager_id]).fetchone()
+            manager_id]).fetchone()
         comment = cur2.execute("SELECT comment FROM calls WHERE manager == ?", [
             manager_id]).fetchone()
         lang = cur2.execute("SELECT lang FROM calls WHERE manager == ?", [

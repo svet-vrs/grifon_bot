@@ -1,7 +1,8 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
+
 class Estate(StatesGroup):
-    user_id = State()    
+    user_id = State()
     name = State()
     lang = State()
     estates = State()
@@ -11,6 +12,7 @@ class Estate(StatesGroup):
     phone_num = State()
     finish = State()
     cancel = State()
+
 
 class Admin(StatesGroup):
     delete_id = State()

@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
+
 def create_connection(path):
     connection = create_connection("E:\\sm_app.sqlite")
     try:
